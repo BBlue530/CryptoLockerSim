@@ -1,16 +1,20 @@
 import os
-import win32com.client
+import sys
 import platform
 
 ####################################################################################################################
 
-def os_check(script_name_exe):
-    if platform.system() == 'Windows':
-        print("Windows Platform") # Debug Message
-        move_to_startup_windows(script_name_exe)
+def os_check(script_name_exe, script_name_elf):
+    if sys.platform == "win32":
+        try:
+            import win32com.client
+            print("Windows Platform") # Debug Message
+            move_to_startup_windows(script_name_exe)
+        except ImportError:
+            pass
     elif platform.system() == 'Linux':
         print("Linux Platform") # Debug Message
-        pass
+        move_to_startup_linux(script_name_elf)
 
 ####################################################################################################################
 
@@ -33,5 +37,26 @@ def move_to_startup_windows(script_name_exe):
     shortcut.WorkingDirectory = os.path.dirname(script_name_exe)
     shortcut.save()
     print("Shortcut Saved") # Debug Message
+
+####################################################################################################################
+
+def move_to_startup_linux(script_name_elf):
+    # It gets moved but still having issues some small issues
+
+    desktop_file_path = os.path.expanduser("~/.config/autostart/myprogram.desktop")
+    os.makedirs(os.path.dirname(desktop_file_path), exist_ok=True)
+    print("The dir exist") # Debug Message
+
+    # This is the template desktop file
+    desktop_file_startup = f"""[Desktop Entry]
+    Type=Application
+    Exec={script_name_elf}
+    X-GNOME-Autostart-enabled=true
+    """
+
+    with open(desktop_file_path, "w") as f:
+        print("Starting to write in desktop file") # Debug Message
+        f.write(desktop_file_startup)
+    print("Desktop writing success") # Debug Message
 
 ####################################################################################################################

