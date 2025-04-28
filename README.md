@@ -25,5 +25,7 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 - **Password protection** for safe decryption.
 - **Startup persistence** simulation.
 - **Brute-force protection** by locking or deleting keys after failed password attempts.
+- **C2 Server to handle private keys, ensuring the right machine gets the correct key when requested.
+- **The C2 server is hosted on an AWS EC2 instance for remote key management.
 
 ---
