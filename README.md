@@ -33,22 +33,22 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 ---
 
 # 📜 Final Legal Notice
-#
-# This project was developed **solely for educational, research, and cybersecurity awareness purposes**.
-# It is intended for use in **controlled environments** such as test networks, virtual machines (VMs), and educational labs.
-#
-# By cloning, downloading, viewing, or using this project in any way, you acknowledge and agree that:
-# - You are fully responsible for your actions.
-# - You will use this project **legally and ethically**.
-# - You will **not** use this project for unauthorized access, disruption, damage, or harm to others' systems, networks, or data.
-# - You understand that **misuse may be illegal** under local, national, or international laws.
-#
-# The creator of this project **do not condone**, **support**, or **encourage** any malicious, unethical, or illegal behavior.
-# **The creator hold no responsibility or liability** for any misuse, damage, loss, or legal consequences resulting from the use of this code.
-#
-# This project exists **to promote understanding** of ransomware techniques so that cybersecurity professionals can better detect, prevent, and respond to real-world threats.
-#
-# ⚠️ **Use responsibly. Stay ethical. Stay legal.**
+
+ This project was developed **solely for educational, research, and cybersecurity awareness purposes**.
+ It is intended for use in **controlled environments** such as test networks, virtual machines (VMs), and educational labs.
+
+ By cloning, downloading, viewing, or using this project in any way, you acknowledge and agree that:
+ - You are fully responsible for your actions.
+ - You will use this project **legally and ethically**.
+ - You will **not** use this project for unauthorized access, disruption, damage, or harm to others' systems, networks, or data.
+ - You understand that **misuse may be illegal** under local, national, or international laws.
+
+ The creator of this project **do not condone**, **support**, or **encourage** any malicious, unethical, or illegal behavior.
+ **The creator hold no responsibility or liability** for any misuse, damage, loss, or legal consequences resulting from the use of this code.
+
+ This project exists **to promote understanding** of ransomware techniques so that cybersecurity professionals can better detect, prevent, and respond to real-world threats.
+
+ ⚠️ **Use responsibly. Stay ethical. Stay legal.**
 
 ---
 
