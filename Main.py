@@ -9,6 +9,9 @@ from VM_Check import running_in_vm
 
 ####################################################################################################################
 
+confirm = input("This software is for educational purposes only. Do you accept full responsibility for any misuse? (yes/no): ")
+if confirm.lower() != 'yes':
+    exit(1)
 # Do not remove these lines
 vm_check = running_in_vm()
 if not vm_check:

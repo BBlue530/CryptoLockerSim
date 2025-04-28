@@ -6,14 +6,16 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 ## ⚠️ Disclaimer
 
 > **Educational Purposes Only**  
-> 
+>  
 > This project is intended solely for educational, research, and cybersecurity training purposes.  
-> 
+>  
 > - **I do not condone** the use of this project for malicious, illegal, or harmful activities.
 > - **I am not responsible** for any damages, legal consequences, or misuse of this code.
 > - **You are fully responsible** for how you use this information and code.
 > - **Only use it** inside isolated environments such as Virtual Machines (VMs) or test sandboxes.
-> 
+> - **This project will not function outside a Virtual Machine (VM).**  
+>   It has been designed **exclusively** for testing in isolated environments. If run outside a VM, the program will exit without performing any actions.
+
 > By cloning, downloading, or using this project, you agree to use it responsibly and legally.
 
 ---
