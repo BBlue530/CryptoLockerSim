@@ -1,43 +1,45 @@
 import os
 import platform
 import subprocess
+from Variables import dmi_files, vm_indicators, vm_mac_prefixes
 
 def running_in_vm():
     system = platform.system()
 
-    # CPU flag check for hypervisor on linux
     if system == "Linux":
         try:
             with open("/proc/cpuinfo", "r") as f:
                 if "hypervisor" in f.read().lower():
                     return True
-        except FileNotFoundError:
+        except:
             pass
-        # Check for vm vendor strings
-        dmi_files = [
-            "/sys/class/dmi/id/product_name",
-            "/sys/class/dmi/id/product_version",
-            "/sys/class/dmi/id/sys_vendor",
-        ]
-        vm_indicators = ["virtual", "vmware", "qemu", "kvm", "xen", "microsoft", "parallels", "bhyve"]
+        
         for path in dmi_files:
             if os.path.exists(path):
                 try:
-                    text = open(path, "r").read().lower()
-                    if any(ind in text for ind in vm_indicators):
-                        return True
-                except Exception:
+                    with open(path, "r") as f:
+                        if any(ind in f.read().lower() for ind in vm_indicators):
+                            return True
+                except:
                     pass
-    # Check for WMI if its on metal or vm
+
     elif system == "Windows":
         try:
-            output = subprocess.check_output(
-                ["wmic", "computersystem", "get", "model"],
-                stderr=subprocess.DEVNULL,
-                stdin=subprocess.DEVNULL
-            ).decode(errors="ignore").lower()
-            if any(ind in output for ind in ["virtual", "vmware", "virtualbox", "kvm", "qemu", "hyper-v", "xen"]):
-                return True
-        except Exception:
+            for command in [["wmic", "computersystem", "get", "model"],
+                            ["wmic", "bios", "get", "manufacturer"],
+                            ["wmic", "baseboard", "get", "manufacturer"]]:
+                output = subprocess.check_output(command, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL).decode(errors="ignore").lower()
+                if any(ind in output for ind in vm_indicators):
+                    return True
+        except:
             pass
+
+    try:
+        import uuid
+        mac = uuid.getnode()
+        mac_str = ':'.join(['{:02x}'.format((mac >> ele) & 0xff) for ele in range(40, -1, -8)])
+        if any(mac_str.startswith(prefix) for prefix in vm_mac_prefixes):
+            return True
+    except:
+        pass
     return False

