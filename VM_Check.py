@@ -1,6 +1,7 @@
 import os
 import platform
 import subprocess
+import cpuinfo
 from Variables import dmi_files, vm_indicators, vm_mac_prefixes
 
 def running_in_vm():
@@ -18,8 +19,14 @@ def running_in_vm():
             return True
 
     elif system == "Windows":
+        if hypervisor_check():
+            print("hypervisor triggered vm") # Debug Message
+            return True
         if wmic_check():
             print("wmic triggered vm") # Debug Message
+            return True
+        if dmi_file_check():
+            print("dmi file triggered vm") # Debug Message
             return True
         if mac_address_check():
             print("mac address triggered vm") # Debug Message
@@ -32,9 +39,9 @@ def running_in_vm():
 # Checks for linux VM
 def hypervisor_check():
     try:
-        with open("/proc/cpuinfo", "r") as f:
-            if "hypervisor" in f.read().lower():
-                return True
+        info = cpuinfo.get_cpu_info()
+        if "hypervisor" in info.get("flags", []):
+            return True
     except:
         pass
     return False
