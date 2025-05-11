@@ -1,15 +1,32 @@
-MIT License with Educational Use and Controlled Environment Clause
-Copyright (c) 2024 [BBlue530]
+MIT License 
+with Educational and Controlled Environment Use Clause  
+Copyright (c) 2024 BBlue530
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software under the following conditions:
-Educational Use Only:
-This software is intended for educational, research, and cybersecurity training purposes only. It must be used within controlled, isolated environments, such as virtual machines (VMs) or sandboxes, that are completely isolated from production or live systems. Any use outside such environments is prohibited.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software **exclusively for educational, research, or cybersecurity training purposes**, 
+subject to the following conditions:
 
-No Commercial Use:
-The software may not be used for any commercial purposes, including but not limited to selling, licensing, or using in any commercial product or service.
+1. **Educational and Controlled Use Only**  
+   The Software may only be used within isolated, controlled environments such as virtual machines (VMs), containers, or sandboxed labs.  
+   Use on production systems or public networks is strictly prohibited.
 
-Restricted Distribution:
-You may not distribute this software or any modified versions of it in a way that encourages, supports, or enables malicious, illegal, or unauthorized use.
+2. **Non-Commercial Use Only**  
+   The Software may not be used, in whole or in part, for commercial purposes.  
+   This includes, but is not limited to, selling, sublicensing, bundling with paid products, or using in paid services.
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+3. **Restricted Distribution**  
+   Redistribution of the Software or modified versions is permitted only if it does not enable, promote, or facilitate malicious, illegal, or unauthorized use.  
+   You must include this license and the original copyright.
+
+4. **Preservation of Notice**  
+   The above copyright notice and this permission notice shall 
+   be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
