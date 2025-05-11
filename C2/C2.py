@@ -9,6 +9,8 @@ import random
 
 app = Flask(__name__)
 
+api_key = "12345"
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KEY_STORAGE_DIR = os.path.join(BASE_DIR, "keys")
 DB_PATH = os.path.join(BASE_DIR, "payments.db")
@@ -64,6 +66,9 @@ start_mock_payment()
 
 @app.route('/upload_key', methods=['POST'])
 def upload_key():
+    received_api_key = request.headers.get('API-KEY')
+    if received_api_key != api_key:
+        return jsonify({"error": "Invalid API Key"}), 403
     key_file = request.files.get('key')
     if not key_file:
         return jsonify({"error": "No key provided"}), 400 # Debug Message
@@ -88,6 +93,9 @@ def upload_key():
 
 @app.route('/get_key/<unique_id>', methods=['GET'])
 def get_key(unique_id):
+    received_api_key = request.headers.get('API-KEY')
+    if received_api_key != api_key:
+        return jsonify({"error": "Invalid API Key"}), 403
     key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
 
     if not os.path.exists(key_path):
@@ -107,6 +115,9 @@ def get_key(unique_id):
 
 @app.route('/payment_status/<unique_id>', methods=['GET'])
 def payment_status(unique_id):
+    received_api_key = request.headers.get('API-KEY')
+    if received_api_key != api_key:
+        return jsonify({"error": "Invalid API Key"}), 403
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('SELECT paid FROM payments WHERE unique_id = ?', (unique_id,))

