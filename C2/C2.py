@@ -3,6 +3,10 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_limiter.errors import RateLimitExceeded
 import os
+import logging
+import json
+import sys
+from datetime import datetime, timezone
 import sqlite3
 import threading
 import time
@@ -20,9 +24,16 @@ limiter = Limiter(
     default_limits=["20 per minute"]
 )
 
-@app.errorhandler(RateLimitExceeded)
-def ratelimit_handler(e):
-    return jsonify(error="rate limit exceeded"), 429
+logging.getLogger('werkzeug').setLevel(logging.ERROR)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(message)s',
+    handlers=[
+        logging.FileHandler('log.json'), # This will pump out into .json file
+        logging.StreamHandler(sys.stdout) # This will pump out into terminal
+    ]
+)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KEY_STORAGE_DIR = os.path.join(BASE_DIR, "keys")
@@ -145,7 +156,27 @@ def payment_status(unique_id):
 
 ####################################################################################################################
 
+@app.errorhandler(RateLimitExceeded)
+def ratelimit_handler(e):
+    return jsonify(error="rate limit exceeded"), 429
+
+####################################################################################################################
+
+@app.after_request
+def log_response(response):
+    log_entry = {
+        "time": datetime.now(timezone.utc).isoformat(),
+        "ip": request.remote_addr,
+        "method": request.method,
+        "endpoint": request.path,
+        "status": response.status_code
+    }
+    logging.info(json.dumps(log_entry))
+    return response
+
+####################################################################################################################
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
 
 ####################################################################################################################
