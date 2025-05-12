@@ -1,4 +1,7 @@
 from flask import Flask, request, jsonify, send_file
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
+from flask_limiter.errors import RateLimitExceeded
 import os
 import sqlite3
 import threading
@@ -10,6 +13,16 @@ import random
 app = Flask(__name__)
 
 api_key = "12345"
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["20 per minute"]
+)
+
+@app.errorhandler(RateLimitExceeded)
+def ratelimit_handler(e):
+    return jsonify(error="rate limit exceeded"), 429
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KEY_STORAGE_DIR = os.path.join(BASE_DIR, "keys")
