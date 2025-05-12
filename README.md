@@ -70,11 +70,3 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ---
-
-### Abuse Report:
-
-If you come across any abuse, misuse, or malicious use of this project, please report it immediately to:
-
-**Email:** [bblue530contact@gmail.com](mailto:bblue530contact@gmail.com)
-
-Thank you for helping to keep the project ethical and legal!
