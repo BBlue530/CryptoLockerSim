@@ -34,7 +34,7 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 
 1: Open and edit `c2_server = "http://c2-server-ip:5000"` in `Variables.py` file to what your C2 server ip is.
 
-2: Navigate to C2 directory and install dependencies on the C2 server.
+2: Navigate to `C2` directory and install dependencies on the C2 server.
 ```
 pip install -r C2_requirements.txt
 ```
@@ -44,7 +44,7 @@ pip install -r C2_requirements.txt
 python3 C2.py
 ```
 
-4: Install dependencies on the target VM
+4: Navigate to `Client` directory and install dependencies on the target VM
 ```
 pip install -r requirements.txt
 ```
