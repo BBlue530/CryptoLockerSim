@@ -4,9 +4,10 @@ from flask_limiter.util import get_remote_address
 from flask_limiter.errors import RateLimitExceeded
 import os
 import logging
+import uuid
 import json
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import sqlite3
 import threading
 import time
@@ -19,6 +20,10 @@ app = Flask(__name__)
 api_key = "12345"
 
 seconds_left = 60
+
+active_sessions = {}
+
+session_token_expiration = timedelta(seconds = seconds_left)
 
 limiter = Limiter(
     get_remote_address,
@@ -124,6 +129,21 @@ start_mock_payment()
 
 ####################################################################################################################
 
+@app.route('/create_session', methods=['POST'])
+def init_session():
+    received_api_key = request.headers.get('API-KEY')
+    if received_api_key != api_key:
+        return jsonify({"error": "Invalid API Key"}), 403
+
+    session_token = str(uuid.uuid4())
+    
+    expiration_time = datetime.now(timezone.utc) + session_token_expiration
+    active_sessions[session_token] = expiration_time
+
+    return jsonify({"session_token": session_token})
+
+####################################################################################################################
+
 @app.route('/upload_key', methods=['POST'])
 def upload_key():
     received_api_key = request.headers.get('API-KEY')
@@ -132,6 +152,14 @@ def upload_key():
     key_file = request.files.get('key')
     if not key_file:
         return jsonify({"error": "No key provided"}), 400 # Debug Message
+    
+    session_token = request.headers.get('Session-Token')
+    expiration_time = active_sessions.get(session_token)
+    if not expiration_time:
+        return jsonify({"error": "Invalid session token"}), 401
+    if datetime.now(timezone.utc) > expiration_time:
+        del active_sessions[session_token]
+        return jsonify({"error": "Session token expired"}), 401
 
     key_filename = key_file.filename
     key_path = os.path.join(KEY_STORAGE_DIR, key_filename)
@@ -156,6 +184,15 @@ def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
     if received_api_key != api_key:
         return jsonify({"error": "Invalid API Key"}), 403
+    
+    session_token = request.headers.get('Session-Token')
+    expiration_time = active_sessions.get(session_token)
+    if not expiration_time:
+        return jsonify({"error": "Invalid session token"}), 401
+    if datetime.now(timezone.utc) > expiration_time:
+        del active_sessions[session_token]
+        return jsonify({"error": "Session token expired"}), 401
+    
     key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
 
     if not os.path.exists(key_path):
@@ -178,6 +215,15 @@ def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
     if received_api_key != api_key:
         return jsonify({"error": "Invalid API Key"}), 403
+    
+    session_token = request.headers.get('Session-Token')
+    expiration_time = active_sessions.get(session_token)
+    if not expiration_time:
+        return jsonify({"error": "Invalid session token"}), 401
+    if datetime.now(timezone.utc) > expiration_time:
+        del active_sessions[session_token]
+        return jsonify({"error": "Session token expired"}), 401
+
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute('SELECT paid FROM payments WHERE unique_id = ?', (unique_id,))
@@ -200,12 +246,16 @@ def ratelimit_handler(e):
 
 @app.after_request
 def log_response(response):
+    response_data = {}
+    if response.is_json:
+        response_data = response.get_json()
     log_entry = {
         "time": datetime.now(timezone.utc).isoformat(),
         "ip": request.remote_addr,
         "method": request.method,
         "endpoint": request.path,
-        "status": response.status_code
+        "status": response.status_code,
+        "response": response_data
     }
     logging.info(json.dumps(log_entry))
     return response
