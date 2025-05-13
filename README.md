@@ -3,7 +3,7 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 
 ---
 
-## ⚠️ Disclaimer
+# ⚠️ Disclaimer
 
 > **Educational Purposes Only**  
 >  
@@ -20,17 +20,26 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 
 ---
 
-## Features
+# Features
 
-- **RSA + AES encryption** of user files.
-- **Timer system** for file destruction or decryption deadline.
-- **Password protection** for safe decryption.
-- **Startup persistence** simulation.
-- **Brute-force protection** by locking or deleting keys after failed password attempts.
-- **C2 Server** to handle private keys, ensuring the right machine gets the correct key when requested.
+### C2 Features
+- **Key Upload & Delivery** - Stores and sends RSA keys to verified clients.
+- **JWT Sessions** - Authenticated client sessions with expiration.
+- **Mock Payments** - Simulated BTC address and payment tracking.
+- **Key Expiry** - Auto-deletes keys after timer ends.
+- **Rate Limiting** - Prevents API abuse and flooding.
+- **Logging** - Logs all requests and responses in JSON.
+- **Access Control** - Requires API key and session token.
+- **SQLite DB** - Tracks keys, payments, and timestamps.
+
+### Client Features
+- **RSA + AES Encryption** - Encrypts user files with hybrid encryption.
+- **Destruction Timer** - Deletes keys or files after countdown expires.
+- **Persistence Simulation** - Mimics startup behavior on reboot.
+- **C2 Communication** - Interacts with the C2 server for key upload, status checks, and decryption.
 
 ---
-## Usage
+# Usage
 
 1: Open and edit `c2_server = "http://c2-server-ip:5000"` in `Variables.py` file to what your C2 server ip is.
 
