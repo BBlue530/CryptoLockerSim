@@ -1,5 +1,4 @@
 import os
-from datetime import timedelta
 
 ####################################################################################################################
 
@@ -7,9 +6,7 @@ api_key = "12345"
 
 seconds_left = 60
 
-active_sessions = {}
-
-session_token_expiration = timedelta(seconds = seconds_left)
+jwt_key = "Test Key"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KEY_STORAGE_DIR = os.path.join(BASE_DIR, "keys")
