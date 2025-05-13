@@ -28,7 +28,32 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 - **Startup persistence** simulation.
 - **Brute-force protection** by locking or deleting keys after failed password attempts.
 - **C2 Server** to handle private keys, ensuring the right machine gets the correct key when requested.
-- The C2 server is hosted on an AWS EC2 instance for remote key management.
+
+---
+## Usage
+
+1: Open and edit `c2_server = "http://c2-server-ip:5000"` in `Variables.py` file to what your C2 server ip is.
+
+2: Navigate to C2 directory and install dependencies on the C2 server.
+```
+pip install -r C2_requirements.txt
+```
+
+3: Run the C2 server using `C2.py`
+```
+python3 C2.py
+```
+
+4: Install dependencies on the target VM
+```
+pip install -r requirements.txt
+```
+
+5: Run `Main.py` on the target VM
+```
+python3 Main.py
+```
+
 
 ---
 
@@ -70,11 +95,3 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 
 ---
-
-### Abuse Report:
-
-If you come across any abuse, misuse, or malicious use of this project, please report it immediately to:
-
-**Email:** [bblue530contact@gmail.com](mailto:bblue530contact@gmail.com)
-
-Thank you for helping to keep the project ethical and legal!
