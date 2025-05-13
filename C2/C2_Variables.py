@@ -4,7 +4,7 @@ import os
 
 api_key = "12345"
 
-seconds_left = 60
+seconds_left = 180
 
 jwt_key = "Test Key"
 
