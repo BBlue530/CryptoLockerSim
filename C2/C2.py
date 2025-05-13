@@ -18,6 +18,8 @@ app = Flask(__name__)
 
 api_key = "12345"
 
+seconds_left = 60
+
 limiter = Limiter(
     get_remote_address,
     app=app,
@@ -48,7 +50,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS payments (
             unique_id TEXT PRIMARY KEY,
             btc_address TEXT,
-            paid BOOLEAN DEFAULT 0
+            paid BOOLEAN DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
@@ -58,6 +61,39 @@ init_db()
 
 ####################################################################################################################
 
+def check_expired_keys():
+    while True:
+        time.sleep(15)
+        print("Checking for expired keys") # Debug Message
+        expired_time = datetime.now(timezone.utc).timestamp() - seconds_left
+
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT unique_id, created_at FROM payments WHERE paid = 0')
+        unpaid_keys = c.fetchall()
+
+        for unique_id, created_at in unpaid_keys:
+            if created_at is None:
+                continue
+            created_ts = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S").timestamp()
+            if created_ts < expired_time:
+                key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
+                if os.path.exists(key_path):
+                    os.remove(key_path)
+                c.execute('DELETE FROM payments WHERE unique_id = ?', (unique_id,)) # Removes expired keys
+                print(f"{unique_id} Expired")
+        
+        conn.commit()
+        conn.close()
+
+def start_remove_expired_keys():
+    thread = threading.Thread(target=check_expired_keys)
+    thread.daemon = True
+    thread.start()
+
+start_remove_expired_keys()
+
+####################################################################################################################
 # This will just simulate mock payment
 def mock_payment():
     while True:
