@@ -109,7 +109,6 @@ def upload_key():
 
 ####################################################################################################################
 
-# Vulnerable to: Path Traversal
 @app.route('/get_key/<unique_id>', methods=['GET'])
 def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
@@ -117,11 +116,14 @@ def get_key(unique_id):
     validation_failed = check_keys(received_api_key, session_token)
     if validation_failed:
         return validation_failed
-    
-    key_path = os.path.join(KEY_STORAGE_DIR, unique_id)
 
-    if not os.path.exists(key_path):
-        return jsonify({"error": "Key not found"}), 404 # Debug Message
+    unique_id_safe = secure_filename(unique_id)
+    key_path = os.path.join(KEY_STORAGE_DIR, unique_id_safe)
+    correct_key_path = os.path.realpath(key_path)
+    if not correct_key_path.startswith(os.path.realpath(KEY_STORAGE_DIR)):
+        return jsonify({"error": "File path"}), 400
+    if not os.path.exists(correct_key_path):
+        return jsonify({"error": "Filename not found"}), 404
 
     try:
         return send_file(
@@ -136,7 +138,6 @@ def get_key(unique_id):
 
 ####################################################################################################################
 
-# Vulnerable to: Path Traversal
 @app.route('/payment_status/<unique_id>', methods=['GET'])
 def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
@@ -144,6 +145,14 @@ def payment_status(unique_id):
     validation_failed = check_keys(received_api_key, session_token)
     if validation_failed:
         return validation_failed
+    
+    unique_id_safe = secure_filename(unique_id)
+    key_path = os.path.join(KEY_STORAGE_DIR, unique_id_safe)
+    correct_key_path = os.path.realpath(key_path)
+    if not correct_key_path.startswith(os.path.realpath(KEY_STORAGE_DIR)):
+        return jsonify({"error": "File path"}), 400
+    if not os.path.exists(correct_key_path):
+        return jsonify({"error": "Filename not found"}), 404
     
     try:
         conn = sqlite3.connect(DB_PATH)
