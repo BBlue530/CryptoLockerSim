@@ -10,8 +10,7 @@ from C2_Variables import DB_PATH, KEY_STORAGE_DIR, seconds_left
 
 def check_expired_keys():
     while True:
-        time.sleep(15)
-        print("Checking for expired keys") # Debug Message
+        time.sleep(30)
         expired_time = datetime.now(timezone.utc).timestamp() - seconds_left
 
         conn = sqlite3.connect(DB_PATH)
@@ -47,7 +46,6 @@ def mock_payment():
         for row in unpaid:
             unique_id = row[0]
             btc_received = random.uniform(0.004, 0.008)  # Random amount transfered for testing
-            print(f"Received: {unique_id}: {btc_received:.6f} BTC")
 
             if btc_received >= 0.005:  # When btc_received is 0.005
                 c.execute('UPDATE payments SET paid = 1 WHERE unique_id = ?', (unique_id,))

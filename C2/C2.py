@@ -48,23 +48,29 @@ start_mock_payment()
 
 @app.route('/create_session', methods=['POST'])
 def create_jwt_session():
-    received_api_key = request.headers.get('API-KEY')
-    if received_api_key != api_key:
-        return jsonify({"error": "Invalid API Key"}), 403
+    try:
+        received_api_key = request.headers.get('API-KEY')
+        if received_api_key != api_key:
+            return jsonify({"error": "Invalid API Key"}), 403
 
-    expiration = datetime.now(timezone.utc) + timedelta(seconds = seconds_left)
-    payload = {
-        "exp": expiration,
-        "iat": datetime.now(timezone.utc).timestamp(),
-        "sub": "session"
-    }
-    session_token = jwt.encode(payload, jwt_key, algorithm="HS256")
+        expiration = datetime.now(timezone.utc) + timedelta(seconds = seconds_left)
+        payload = {
+            "exp": expiration,
+            "iat": datetime.now(timezone.utc).timestamp(),
+            "sub": "session"
+        }
+        session_token = jwt.encode(payload, jwt_key, algorithm="HS256")
 
-    return jsonify({"session_token": session_token})
+        return jsonify({"session_token": session_token})
+    except Exception as e:
+        print(f"Error: {e}") # Debug Message
+        return jsonify({"Error": "Error Happen"}), 500
 
 ####################################################################################################################
 
-@app.route('/upload_key', methods=['POST']) # NEED TO SECURE THIS RIGHT NOW IT CAN GET ABUSED
+# Vulnerable to: Path Traversal, Unrestricted File Uploads, 
+# Insufficient Filename Uniqueness & Replay/Overwrite
+@app.route('/upload_key', methods=['POST']) 
 def upload_key():
 
     received_api_key = request.headers.get('API-KEY')
@@ -89,12 +95,14 @@ def upload_key():
                   (key_filename, btc_address, False))
         conn.commit()
         conn.close()
-        return jsonify({"message": "Key uploaded", "file": key_filename, "btc_address": btc_address}), 200 # Debug Message
+        return jsonify({"file": key_filename, "btc_address": btc_address}), 200 # Debug Message
     except Exception as e:
-        return jsonify({"error": str(e)}), 500 # Debug Message
+        print(f"Error: {e}") # Debug Message
+        return jsonify({"Error": "Error Happen"}), 500
 
 ####################################################################################################################
 
+# Vulnerable to: Path Traversal
 @app.route('/get_key/<unique_id>', methods=['GET'])
 def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
@@ -116,10 +124,12 @@ def get_key(unique_id):
             download_name=unique_id
         )
     except Exception as e:
-        return jsonify({"Error": str(e)}), 500 # Debug Message
+        print(f"Error: {e}") # Debug Message
+        return jsonify({"Error": "Error Happen"}), 500
 
 ####################################################################################################################
 
+# Vulnerable to: Path Traversal
 @app.route('/payment_status/<unique_id>', methods=['GET'])
 def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
@@ -127,18 +137,22 @@ def payment_status(unique_id):
     validation_failed = check_keys(received_api_key, session_token)
     if validation_failed:
         return validation_failed
+    
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('SELECT paid FROM payments WHERE unique_id = ?', (unique_id,))
+        result = c.fetchone()
+        conn.close()
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT paid FROM payments WHERE unique_id = ?', (unique_id,))
-    result = c.fetchone()
-    conn.close()
+        if result is None:
+            return jsonify({"error": "Unique ID not found"}), 404
 
-    if result is None:
-        return jsonify({"error": "Unique ID not found"}), 404
-
-    paid = bool(result[0])
-    return jsonify({"unique_id": unique_id, "paid": paid}), 200
+        paid = bool(result[0])
+        return jsonify({"unique_id": unique_id, "paid": paid}), 200
+    except Exception as e:
+        print(f"Error: {e}") # Debug Message
+        return jsonify({"Error": "Error Happen"}), 500
 
 ####################################################################################################################
 
