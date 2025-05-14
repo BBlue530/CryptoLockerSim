@@ -4,3 +4,4 @@ Flask
 pysqlite3
 Flask-Limiter
 PyJWT
+werkzeug

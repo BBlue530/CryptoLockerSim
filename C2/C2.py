@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_file
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_limiter.errors import RateLimitExceeded
+from werkzeug.utils import secure_filename
 import os
 import logging
 import jwt
@@ -68,8 +69,7 @@ def create_jwt_session():
 
 ####################################################################################################################
 
-# Vulnerable to: Path Traversal, Unrestricted File Uploads, 
-# Insufficient Filename Uniqueness & Replay/Overwrite
+# Vulnerable to: Insufficient Filename Uniqueness & Replay/Overwrite
 @app.route('/upload_key', methods=['POST']) 
 def upload_key():
 
@@ -83,8 +83,15 @@ def upload_key():
     if not key_file:
         return jsonify({"error": "No key provided"}), 400 # Debug Message
 
-    key_filename = key_file.filename
+    key_filename = secure_filename(key_file.filename)
+    if not key_filename.endswith(".pem"):
+        return jsonify({"error": "File type"}), 400
+    
     key_path = os.path.join(KEY_STORAGE_DIR, key_filename)
+    correct_key_path = os.path.realpath(key_path)
+    if not correct_key_path.startswith(os.path.realpath(KEY_STORAGE_DIR)):
+        return jsonify({"error": "Filename"}), 400
+
     btc_address = f"mock_btc_{random.randint(1000,9999)}"
 
     try:
