@@ -95,7 +95,8 @@ def upload_key():
     btc_address = f"mock_btc_{random.randint(1000,9999)}"
 
     try:
-        key_file.save(key_path)
+        key_file.save(correct_key_path)
+        os.chmod(correct_key_path, 0o600) # Changes file to read and write for only owner
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute('INSERT OR REPLACE INTO payments (unique_id, btc_address, paid) VALUES (?, ?, ?)',

