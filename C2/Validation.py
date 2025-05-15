@@ -2,7 +2,11 @@ from flask import request, jsonify
 import jwt
 from C2_Variables import api_key, jwt_key
 
-def check_keys(received_api_key, session_token):
+def check_keys(received_api_key, session_token, jwt_ip, received_ip):
+    print(f"jwt_ip: {jwt_ip}") # Debug Message
+    print(f"received_ip: {received_ip}") # Debug Message
+    if jwt_ip != received_ip:
+        return jsonify({"error": "IP match"}), 403
     if not received_api_key:
         return jsonify({"error": "Missing API Key"}), 401
     if not session_token:

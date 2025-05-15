@@ -58,7 +58,7 @@ def create_jwt_session():
         payload = {
             "exp": expiration,
             "iat": datetime.now(timezone.utc).timestamp(),
-            "sub": "session"
+            "sub": request.remote_addr
         }
         session_token = jwt.encode(payload, jwt_key, algorithm="HS256")
 
@@ -75,13 +75,16 @@ def upload_key():
 
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
-    validation_failed = check_keys(received_api_key, session_token)
+    received_ip = request.remote_addr
+    decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
+    jwt_ip = decode_jwt.get("sub")
+    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip)
     if validation_failed:
         return validation_failed
 
     key_file = request.files.get('key')
     if not key_file:
-        return jsonify({"error": "No key provided"}), 400 # Debug Message
+        return jsonify({"error": "No key provided"}), 400
 
     key_filename = secure_filename(key_file.filename)
     if not key_filename.endswith(".pem"):
@@ -103,7 +106,7 @@ def upload_key():
                   (key_filename, btc_address, False))
         conn.commit()
         conn.close()
-        return jsonify({"file": key_filename, "btc_address": btc_address}), 200 # Debug Message
+        return jsonify({"file": key_filename, "btc_address": btc_address}), 200
     except Exception as e:
         print(f"Error: {e}") # Debug Message
         return jsonify({"Error": "Error Happen"}), 500
@@ -114,7 +117,10 @@ def upload_key():
 def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
-    validation_failed = check_keys(received_api_key, session_token)
+    received_ip = request.remote_addr
+    decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
+    jwt_ip = decode_jwt.get("sub")
+    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip)
     if validation_failed:
         return validation_failed
 
@@ -143,7 +149,10 @@ def get_key(unique_id):
 def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
-    validation_failed = check_keys(received_api_key, session_token)
+    received_ip = request.remote_addr
+    decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
+    jwt_ip = decode_jwt.get("sub")
+    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip)
     if validation_failed:
         return validation_failed
     
