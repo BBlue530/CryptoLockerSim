@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 import os
 import logging
 import jwt
+import uuid
 from datetime import timedelta
 import json
 import sys
@@ -55,14 +56,16 @@ def create_jwt_session():
             return jsonify({"error": "Invalid API Key"}), 403
 
         expiration = datetime.now(timezone.utc) + timedelta(seconds = seconds_left)
+        unique_uuid = str(uuid.uuid4())
         payload = {
             "exp": expiration,
             "iat": datetime.now(timezone.utc).timestamp(),
-            "sub": request.remote_addr
+            "ip": request.remote_addr,
+            "uuid": unique_uuid
         }
         session_token = jwt.encode(payload, jwt_key, algorithm="HS256")
 
-        return jsonify({"session_token": session_token})
+        return jsonify({"session_token": session_token, "uuid": unique_uuid})
     except Exception as e:
         print(f"Error: {e}") # Debug Message
         return jsonify({"Error": "Error Happen"}), 500
@@ -72,13 +75,14 @@ def create_jwt_session():
 # Vulnerable to: Insufficient Filename Uniqueness & Replay/Overwrite
 @app.route('/upload_key', methods=['POST']) 
 def upload_key():
-
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
+    unique_uuid = request.headers.get('uuid')
     received_ip = request.remote_addr
     decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    jwt_ip = decode_jwt.get("sub")
-    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip)
+    jwt_ip = decode_jwt.get("ip")
+    jwt_uuid = decode_jwt.get("uuid")
+    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip, unique_uuid, jwt_uuid)
     if validation_failed:
         return validation_failed
 
@@ -117,10 +121,12 @@ def upload_key():
 def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
+    unique_uuid = request.headers.get('uuid')
     received_ip = request.remote_addr
     decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    jwt_ip = decode_jwt.get("sub")
-    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip)
+    jwt_ip = decode_jwt.get("ip")
+    jwt_uuid = decode_jwt.get("uuid")
+    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip, unique_uuid, jwt_uuid)
     if validation_failed:
         return validation_failed
 
@@ -149,10 +155,12 @@ def get_key(unique_id):
 def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
+    unique_uuid = request.headers.get('uuid')
     received_ip = request.remote_addr
     decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    jwt_ip = decode_jwt.get("sub")
-    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip)
+    jwt_ip = decode_jwt.get("ip")
+    jwt_uuid = decode_jwt.get("uuid")
+    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip, unique_uuid, jwt_uuid)
     if validation_failed:
         return validation_failed
     

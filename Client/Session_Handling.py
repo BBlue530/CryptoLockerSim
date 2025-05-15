@@ -17,12 +17,13 @@ def get_session_token():
         if response.status_code == 200:
             response_data = response.json()
             session_token = response_data.get("session_token")
-            
-            if session_token:
+            unique_uuid = response_data.get("uuid")
+
+            if session_token and unique_uuid:
                 with open("session_token.json", "w") as f:
-                    json.dump({"session_token": session_token}, f, indent=4)
-                print(f"Session token saved: {session_token}") # Debug Message
-                return session_token
+                    json.dump({"session_token": session_token, "uuid": unique_uuid}, f, indent=4)
+                print(f"Session token and uuid saved: {session_token} {unique_uuid}") # Debug Message
+                return session_token, unique_uuid
             else:
                 print("Session token not found") # Debug Message
         else:
@@ -45,6 +46,19 @@ def read_session_token():
         print("Session token not found") # Debug Message
     except json.JSONDecodeError:
         print("Error reading session token") # Debug Message
+    return None
+
+####################################################################################################################
+
+def read_unique_uuid():
+    try:
+        with open("session_token.json", "r") as f:
+            data = json.load(f)
+            return data.get("uuid")
+    except FileNotFoundError:
+        print("uuid not found") # Debug Message
+    except json.JSONDecodeError:
+        print("Error reading uuid") # Debug Message
     return None
 
 ####################################################################################################################
