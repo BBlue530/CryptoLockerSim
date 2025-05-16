@@ -6,9 +6,9 @@ import tkinter as tk
 import multiprocessing
 import requests
 from datetime import datetime, timedelta
-from Decrypt import decrypt_all_files
-from Token_Handling import token_check
-from Variables import script_files, seconds_left, password, timer_file_name, c2_server
+from Crypto.Decrypt import decrypt_all_files
+from Session.Token_Handling import token_check
+from Core.Variables import script_files, seconds_left, password, timer_file_name, c2_server
 
 ####################################################################################################################
 

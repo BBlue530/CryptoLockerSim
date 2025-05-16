@@ -6,8 +6,8 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import padding as asym_padding
-from Driver_Handling import root_paths
-from Variables import script_files, system_dirs, system_desktop_dirs
+from System.Driver_Handling import root_paths
+from Core.Variables import script_files, system_dirs, system_desktop_dirs
 
 ####################################################################################################################
 

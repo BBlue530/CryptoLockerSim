@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from Variables import c2_server, rsa_key, api_key, wrong_api_key
+from Core.Variables import c2_server, rsa_key, api_key, wrong_api_key
 
 ####################################################################################################################
 

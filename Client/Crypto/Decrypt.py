@@ -4,9 +4,9 @@ from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding as sym_padding
 from cryptography.hazmat.backends import default_backend
-from RSA_Key_Handling import fetch_and_load_private_key
-from Driver_Handling import root_paths
-from Variables import system_dirs
+from Crypto.RSA_Key_Handling import fetch_and_load_private_key
+from System.Driver_Handling import root_paths
+from Core.Variables import system_dirs
 
 ####################################################################################################################
 

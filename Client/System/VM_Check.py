@@ -2,7 +2,7 @@ import os
 import platform
 import subprocess
 import cpuinfo
-from Variables import dmi_files, vm_indicators, vm_mac_prefixes
+from Core.Variables import dmi_files, vm_indicators, vm_mac_prefixes
 
 def running_in_vm():
     system = platform.system()

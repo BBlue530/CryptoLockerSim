@@ -6,8 +6,8 @@ import json
 import uuid
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
-from Token_Handling import token_check
-from Variables import c2_server, rsa_key
+from Session.Token_Handling import token_check
+from Core.Variables import c2_server, rsa_key
 
 ####################################################################################################################
 
