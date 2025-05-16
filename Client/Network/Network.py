@@ -5,6 +5,7 @@ import socket
 import ipaddress
 import concurrent.futures
 import json
+from Network.Scan_Device import load_ips_from_json, scan_local_ip_ports
 
 ##############################################################################################################################################
 
@@ -169,5 +170,12 @@ def network_scan():
     output_filename = "network.json"
     with open(output_filename, "w") as f:
         json.dump(devices_json, f, indent=4)
+    
+    ips = load_ips_from_json(output_filename)
+    results = scan_local_ip_ports(ips)
+    
+    # Save results inn json
+    with open("ports_scan.json", "w") as f:
+        json.dump(results, f, indent=4)
 
 ##############################################################################################################################################
