@@ -1,8 +1,8 @@
-from RSA_Key_Handling import get_machine_identifier
 from Session_Handling import read_session_token, read_unique_uuid
 from Variables import api_key
 
 def token_check():
+    from RSA_Key_Handling import get_machine_identifier
     unique_id = get_machine_identifier()
     session_token = read_session_token()
     unique_uuid = read_unique_uuid()

