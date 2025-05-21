@@ -26,7 +26,7 @@ app = Flask(__name__)
 limiter = Limiter(
     get_remote_address,
     app=app,
-    default_limits=["20 per minute"]
+    default_limits=[]
 )
 
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
@@ -49,6 +49,7 @@ start_mock_payment()
 ####################################################################################################################
 
 @app.route('/create_session', methods=['POST'])
+@limiter.limit("1 per minute")
 def create_jwt_session():
     try:
         received_api_key = request.headers.get('API-KEY')
@@ -73,6 +74,7 @@ def create_jwt_session():
 ####################################################################################################################
 
 @app.route('/upload_key', methods=['POST']) 
+@limiter.limit("3 per minute")
 def upload_key():
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
@@ -117,6 +119,7 @@ def upload_key():
 ####################################################################################################################
 
 @app.route('/get_key/<unique_id>', methods=['GET'])
+@limiter.limit("3 per minute")
 def get_key(unique_id):
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
@@ -151,6 +154,7 @@ def get_key(unique_id):
 ####################################################################################################################
 
 @app.route('/payment_status/<unique_id>', methods=['GET'])
+@limiter.limit("5 per minute")
 def payment_status(unique_id):
     received_api_key = request.headers.get('API-KEY')
     session_token = request.headers.get('Session-Token')
