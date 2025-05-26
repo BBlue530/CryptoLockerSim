@@ -7,6 +7,7 @@ import logging
 import sys
 import json
 from datetime import datetime, timezone
+import os
 from Extensions import limiter
 # Imprting the blueprints here
 from Routes.Key_Endpoints import key_bp
@@ -21,16 +22,37 @@ app = Flask(__name__)
 
 limiter.init_app(app)
 
+if not os.path.exists('dashboard_log.json'):
+    with open('dashboard_log.json', 'w') as f:
+        f.write('')
+
+if not os.path.exists('c2_log.json'):
+    with open('c2_log.json', 'w') as f:
+        f.write('')
+
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(message)s',
-    handlers=[
-        logging.FileHandler('log.json'), # This will pump out into .json file
-        logging.StreamHandler(sys.stdout) # This will pump out into terminal
-    ]
-)
+dashboard_log = logging.getLogger('dashboard_log')
+dashboard_log.setLevel(logging.INFO)
+dashboard_log.propagate = False
+
+if dashboard_log.hasHandlers():
+    dashboard_log.handlers.clear()
+
+dashboard_handler = logging.FileHandler('dashboard_log.json')
+dashboard_handler.setFormatter(logging.Formatter('%(message)s'))
+dashboard_log.addHandler(dashboard_handler)
+
+c2_log = logging.getLogger('c2_log')
+c2_log.setLevel(logging.INFO)
+c2_log.propagate = False
+
+if c2_log.hasHandlers():
+    c2_log.handlers.clear()
+
+c2_handler = logging.FileHandler('c2_log.json')
+c2_handler.setFormatter(logging.Formatter('%(message)s'))
+c2_log.addHandler(c2_handler)
 
 ####################################################################################################################
 
@@ -61,7 +83,15 @@ def log_response(response):
         "status": response.status_code,
         "response": response_data
     }
-    logging.info(json.dumps(log_entry))
+    log_msg = json.dumps(log_entry)
+
+    if request.path.startswith('/dashboard'):
+        dashboard_log.info(log_msg)
+    elif request.path.startswith('/static'):
+        pass
+    else:
+        c2_log.info(log_msg)
+
     return response
 
 ####################################################################################################################
