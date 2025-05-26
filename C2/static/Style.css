@@ -77,3 +77,7 @@ body {
 .button-group-container {
     margin-bottom: 1em;
 }
+
+.refresh-icon {
+  font-size: 24px;
+}

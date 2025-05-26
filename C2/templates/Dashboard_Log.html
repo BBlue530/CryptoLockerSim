@@ -21,8 +21,24 @@
             <div class="button-group">
                 <button onclick="window.location.href='/dashboard/log/dashboard'">Dashboard Log</button>
                 <button onclick="window.location.href='/dashboard/log/c2'">C2 Log</button>
+                <button onclick="window.location.reload()"><span class="refresh-icon">⟳</span></button>
             </div>
-            <pre>{{ log_data }}</pre>
+            <pre id="log-data">{{ log_data | safe }}</pre>
+
+            <script>
+            function convertutctolocaltime() {
+                const pre = document.getElementById('log-data');
+                let text = pre.textContent;
+
+                text = text.replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d+(\+\d{2}:\d{2}|Z)/g, function(match) {
+                  const date = new Date(match);
+                  return date.toLocaleString(undefined, { hour12: false });
+                });
+
+                pre.textContent = text;
+            }
+            window.onload = convertutctolocaltime;
+            </script>
         </div>
     </main>
 </body>
