@@ -87,7 +87,7 @@ def log_response(response):
 
     if request.path.startswith('/dashboard'):
         dashboard_log.info(log_msg)
-    elif request.path.startswith('/static'):
+    elif request.path.startswith('/static') or request.path.startswith('/favicon.ico'):
         pass
     else:
         c2_log.info(log_msg)
