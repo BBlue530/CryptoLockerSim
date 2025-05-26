@@ -34,6 +34,7 @@ def dashboard_log_dashboard():
                     data.append(obj)
                 except json.JSONDecodeError:
                     pass
+        data.reverse()
         pretty_json = json.dumps(data, indent=4)
     except Exception as e:
         pretty_json = f"Error loading log.json: {e}"
@@ -57,6 +58,7 @@ def dashboard_log_c2():
                     data.append(obj)
                 except json.JSONDecodeError:
                     pass
+        data.reverse()
         pretty_json = json.dumps(data, indent=4)
     except Exception as e:
         pretty_json = f"Error loading log.json: {e}"
