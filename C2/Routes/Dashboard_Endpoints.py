@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import json
 import os
 from Extensions import limiter
-from C2_Variables import DB_PATH, seconds_left
+from C2_Variables import DB_PATH, seconds_left, dashboard_log_json, c2_log_json
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -24,7 +24,7 @@ def dashboard_log():
 
 @dashboard_bp.route('/dashboard/log/dashboard')
 def dashboard_log_dashboard():
-    json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'dashboard_log.json'))
+    json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', f'{dashboard_log_json}'))
     data = []
     try:
         with open(json_path) as f:
@@ -40,7 +40,7 @@ def dashboard_log_dashboard():
         data.reverse()
         pretty_json = json.dumps(data, indent=4)
     except Exception as e:
-        pretty_json = f"Error loading log.json: {e}"
+        pretty_json = f"Error loading json: {e}"
 
     return render_template('Dashboard_Log.html', log_data=pretty_json)
 
@@ -48,7 +48,7 @@ def dashboard_log_dashboard():
 
 @dashboard_bp.route('/dashboard/log/c2')
 def dashboard_log_c2():
-    json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'c2_log.json'))
+    json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', f'{c2_log_json}'))
     data = []
     try:
         with open(json_path) as f:
@@ -64,7 +64,7 @@ def dashboard_log_c2():
         data.reverse()
         pretty_json = json.dumps(data, indent=4)
     except Exception as e:
-        pretty_json = f"Error loading log.json: {e}"
+        pretty_json = f"Error loading json: {e}"
 
     return render_template('Dashboard_Log.html', log_data=pretty_json)
 

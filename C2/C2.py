@@ -9,6 +9,7 @@ import json
 from datetime import datetime, timezone
 import os
 from Extensions import limiter
+from C2_Variables import dashboard_log_json, c2_log_json
 # Imprting the blueprints here
 from Routes.Key_Endpoints import key_bp
 from Routes.JWT_Endpoints import jwt_bp
@@ -22,12 +23,12 @@ app = Flask(__name__)
 
 limiter.init_app(app)
 
-if not os.path.exists('dashboard_log.json'):
-    with open('dashboard_log.json', 'w') as f:
+if not os.path.exists(f'{dashboard_log_json}'):
+    with open(f'{dashboard_log_json}', 'w') as f:
         f.write('')
 
-if not os.path.exists('c2_log.json'):
-    with open('c2_log.json', 'w') as f:
+if not os.path.exists(f'{c2_log_json}'):
+    with open(f'{c2_log_json}', 'w') as f:
         f.write('')
 
 logging.getLogger('werkzeug').setLevel(logging.ERROR)
@@ -39,7 +40,7 @@ dashboard_log.propagate = False
 if dashboard_log.hasHandlers():
     dashboard_log.handlers.clear()
 
-dashboard_handler = logging.FileHandler('dashboard_log.json')
+dashboard_handler = logging.FileHandler(f'{dashboard_log_json}')
 dashboard_handler.setFormatter(logging.Formatter('%(message)s'))
 dashboard_log.addHandler(dashboard_handler)
 
@@ -50,7 +51,7 @@ c2_log.propagate = False
 if c2_log.hasHandlers():
     c2_log.handlers.clear()
 
-c2_handler = logging.FileHandler('c2_log.json')
+c2_handler = logging.FileHandler(f'{c2_log_json}')
 c2_handler.setFormatter(logging.Formatter('%(message)s'))
 c2_log.addHandler(c2_handler)
 
