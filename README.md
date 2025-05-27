@@ -62,6 +62,7 @@ pip install -r requirements.txt
 ```
 python3 Main.py
 ```
+6: Open your browser and go to: `http://c2-server-ip:5000/dashboard/home` to view logs and other dashboard info.
 
 
 ---
