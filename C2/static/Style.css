@@ -81,3 +81,17 @@ body {
 .refresh-icon {
   font-size: 24px;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1e1e1e;
+    color: #dcdcdc;
+}
+th, td {
+    padding: 12px;
+    border: 1px solid #444;
+}
+th {
+    background-color: #333;
+}

