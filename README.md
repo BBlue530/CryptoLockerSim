@@ -41,7 +41,7 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 ---
 # Usage
 
-1: Open and edit `c2_server = "http://c2-server-ip:5000"` in `Variables.py` file to what your C2 server ip is.
+1: Open and edit `c2_ip = "c2-server-ip"` in `Variables.py` file to what your C2 server ip is.
 
 2: Navigate to `C2` directory and install dependencies on the C2 server.
 ```
