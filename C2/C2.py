@@ -8,6 +8,7 @@ import sys
 import json
 from datetime import datetime, timezone
 import os
+from werkzeug.exceptions import RequestEntityTooLarge
 from Extensions import limiter, update_block_ip_list
 from C2_Variables import dashboard_log_json, c2_log_json, blocked_ips
 # Imprting the blueprints here
@@ -20,6 +21,8 @@ from Routes.Dashboard_Endpoints import dashboard_bp
 ####################################################################################################################
 
 app = Flask(__name__)
+
+app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 
 limiter.init_app(app)
 
@@ -64,6 +67,10 @@ app.register_blueprint(payments_bp)
 app.register_blueprint(dashboard_bp)
 
 ####################################################################################################################
+
+@app.errorhandler(RequestEntityTooLarge)
+def handle_file_too_big(e):
+    return jsonify({"error": "File too big"}), 413
 
 @app.errorhandler(RateLimitExceeded)
 def ratelimit_handler(e):

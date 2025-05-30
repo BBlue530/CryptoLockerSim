@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 import jwt
 from C2_Variables import DB_PATH, KEY_STORAGE_DIR, FILE_STORAGE_DIR, extesions, jwt_key
 from Validation import check_keys
-from Extensions import limiter, update_block_ip_list
+from Extensions import limiter, update_block_ip_list, check_uploaded_file
 
 files_bp = Blueprint('files', __name__)
 
@@ -26,14 +26,11 @@ def upload_file():
         return validation_failed
 
     uploaded_file = request.files.get('file')
-    if not uploaded_file:
-        return jsonify({"error": "No file provided"}), 400
+    validation_result = check_uploaded_file(uploaded_file)
+    if validation_result:
+        return validation_result
 
     key_filename = secure_filename(uploaded_file.filename)
-    if not key_filename.endswith(tuple(extesions)):
-        ip = request.remote_addr
-        update_block_ip_list(ip)
-        return jsonify({"error": "File type"}), 400
     
     uploaded_file_path = os.path.join(FILE_STORAGE_DIR, key_filename)
     correct_uploaded_file_path = os.path.realpath(uploaded_file_path)
