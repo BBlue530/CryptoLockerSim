@@ -9,7 +9,7 @@ import json
 from datetime import datetime, timezone
 import os
 from Extensions import limiter
-from C2_Variables import dashboard_log_json, c2_log_json, blocked_ips
+from C2_Variables import dashboard_log_json, c2_log_json, blocked_ips, rate_limit_counter, rate_limit_threshold
 # Imprting the blueprints here
 from Routes.Key_Endpoints import key_bp
 from Routes.JWT_Endpoints import jwt_bp
@@ -67,9 +67,11 @@ app.register_blueprint(dashboard_bp)
 
 @app.errorhandler(RateLimitExceeded)
 def ratelimit_handler(e):
+    ip = request.remote_addr
     if not request.path.startswith('/payment_status'):
-        ip = request.remote_addr
-        blocked_ips.add(ip)
+        rate_limit_counter[ip] += 1
+        if rate_limit_counter[ip] >= rate_limit_threshold:
+            blocked_ips.add(ip)
     return jsonify(error="rate limit exceeded"), 429
 
 @app.before_request
