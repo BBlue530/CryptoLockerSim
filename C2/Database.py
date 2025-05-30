@@ -13,6 +13,7 @@ def init_db():
             unique_id TEXT PRIMARY KEY,
             btc_address TEXT,
             paid BOOLEAN DEFAULT 0,
+            uuid TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')

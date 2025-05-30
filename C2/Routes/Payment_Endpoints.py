@@ -18,10 +18,7 @@ def payment_status(unique_id):
     session_token = request.headers.get('Session-Token')
     unique_uuid = request.headers.get('uuid')
     received_ip = request.remote_addr
-    decode_jwt = jwt.decode(session_token, jwt_key, algorithms=["HS256"])
-    jwt_ip = decode_jwt.get("ip")
-    jwt_uuid = decode_jwt.get("uuid")
-    validation_failed = check_keys(received_api_key, session_token, jwt_ip, received_ip, unique_uuid, jwt_uuid)
+    validation_failed = check_keys(received_api_key, session_token, received_ip, unique_uuid)
     if validation_failed:
         return validation_failed
     
@@ -36,7 +33,7 @@ def payment_status(unique_id):
     try:
         conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
-        c.execute('SELECT paid FROM payments WHERE unique_id = ?', (unique_id,))
+        c.execute('SELECT paid FROM payments WHERE unique_id = ? AND uuid = ?', (unique_id, unique_uuid))
         result = c.fetchone()
         conn.close()
 

