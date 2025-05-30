@@ -41,7 +41,7 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 ---
 # Usage
 
-1: Open and edit `c2_ip = "c2-server-ip"` in `Variables.py` file to what your C2 server ip is.
+1: Open and edit `c2_ip = "<c2-server-ip>"` in `Variables.py` file to what your C2 server ip is.
 
 2: Navigate to `C2` directory and install dependencies on the C2 server.
 ```
@@ -62,7 +62,7 @@ pip install -r requirements.txt
 ```
 python3 Main.py
 ```
-6: Open your browser and go to: `http://c2-server-ip:5000/dashboard/home` to view logs and other dashboard info.
+6: Open your browser and go to: `"http://{c2_ip}:5000/dashboard/home` to view logs and other dashboard info.
 
 
 ---
