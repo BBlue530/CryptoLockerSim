@@ -24,7 +24,7 @@
                 <button onclick="window.location.href='/dashboard/log/c2'">C2 Log</button>
                 <button onclick="window.location.reload()"><span class="refresh-icon">⟳</span></button>
             </div>
-            <pre id="log-data">{{ log_data | safe }}</pre>
+            <pre id="log-data">{{ log_data }}</pre>
 
             <script>
             function convertutctolocaltime() {
