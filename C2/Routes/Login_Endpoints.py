@@ -2,16 +2,19 @@ from flask import Blueprint, request, jsonify, render_template, make_response
 import jwt
 from datetime import datetime, timedelta, timezone
 from C2_Variables import jwt_key_dashboard, jwt_expire_dashboard, username, password
+from Extensions import limiter
 
 login_bp = Blueprint('login', __name__)
 
 ####################################################################################################################
 
 @login_bp.route('/dashboard/login', methods=['GET'])
+@limiter.limit("10 per minute")
 def login_page():
     return render_template('Dashboard_Login.html')
 
 @login_bp.route('/dashboard/login', methods=['POST'])
+@limiter.limit("10 per minute")
 def login():
     data = request.get_json()
     given_username = data.get("username")

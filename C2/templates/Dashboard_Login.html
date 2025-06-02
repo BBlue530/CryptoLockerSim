@@ -47,7 +47,6 @@
             const data = await response.json();
 
             if (response.ok) {
-                localStorage.setItem('token', data.token);
                 window.location.href = '/dashboard/home';
             } else {
                 document.getElementById('message').innerText = data.error || 'Login failed';
