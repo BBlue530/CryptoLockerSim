@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>C2 Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Style.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">C2 Dashboard</div>
+        <ul class="nav-links">
+            <li><a href="/dashboard/home">Home</a></li>
+            <li><a href="/dashboard/log">Log</a></li>
+            <li><a href="/dashboard/payments">Payments</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p id="message"></p>
+    </main>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('/dashboard/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                localStorage.setItem('token', data.token);
+                window.location.href = '/dashboard/home';
+            } else {
+                document.getElementById('message').innerText = data.error || 'Login failed';
+            }
+        });
+    </script>
+</body>
+</html>

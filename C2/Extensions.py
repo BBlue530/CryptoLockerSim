@@ -1,9 +1,9 @@
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask import jsonify
+from flask import jsonify, redirect, render_template
 from werkzeug.utils import secure_filename
-import os
-from C2_Variables import blocked_ips, rate_limit_counter, rate_limit_threshold, extesions
+import jwt
+from C2_Variables import blocked_ips, rate_limit_counter, rate_limit_threshold, extesions, jwt_key_dashboard
 
 ####################################################################################################################
 
@@ -54,5 +54,47 @@ def check_pem_file(uploaded_file):
             return False, "File type not allowed"
 
     return True, None
+    
+####################################################################################################################
+
+def check_token(token, web_page):
+
+    if not token:
+        return redirect('/dashboard/login')
+    
+    try:
+        payload = jwt.decode(token, jwt_key_dashboard, algorithms=["HS256"])
+        role = payload.get("role")
+        if role != "admin":
+            return redirect('/dashboard/login')
+        
+        return render_template(web_page)
+    
+    except jwt.ExpiredSignatureError:
+        return redirect('/dashboard/login')
+    
+    except jwt.InvalidTokenError:
+        return redirect('/dashboard/login')
+    
+####################################################################################################################
+
+def check_token_log(token, web_page, log_data):
+
+    if not token:
+        return redirect('/dashboard/login')
+    
+    try:
+        payload = jwt.decode(token, jwt_key_dashboard, algorithms=["HS256"])
+        role = payload.get("role")
+        if role != "admin":
+            return redirect('/dashboard/login')
+        
+        return render_template(web_page, log_data=log_data)
+    
+    except jwt.ExpiredSignatureError:
+        return redirect('/dashboard/login')
+    
+    except jwt.InvalidTokenError:
+        return redirect('/dashboard/login')
     
 ####################################################################################################################

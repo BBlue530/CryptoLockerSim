@@ -6,8 +6,12 @@ from collections import defaultdict
 api_key = "12345"
 
 seconds_left = 660
-
 jwt_key = "Test Key"
+
+jwt_key_dashboard = "Dashboard Test Key"
+jwt_expire_dashboard = 60
+username = "123"
+password = "123"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 KEY_STORAGE_DIR = os.path.join(BASE_DIR, "keys")

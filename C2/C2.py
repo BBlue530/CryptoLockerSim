@@ -17,6 +17,7 @@ from Routes.JWT_Endpoints import jwt_bp
 from Routes.Files_Endpoints import files_bp
 from Routes.Payment_Endpoints import payments_bp
 from Routes.Dashboard_Endpoints import dashboard_bp
+from Routes.Login_Endpoints import login_bp
 
 ####################################################################################################################
 
@@ -65,6 +66,7 @@ app.register_blueprint(jwt_bp)
 app.register_blueprint(files_bp)
 app.register_blueprint(payments_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(login_bp)
 
 ####################################################################################################################
 
