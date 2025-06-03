@@ -1,7 +1,7 @@
 import requests
 import json
 import time
-from Core.Variables import c2_server, api_key
+from Core.Variables import c2_server, api_key, cert_path
 
 ####################################################################################################################
 
@@ -11,7 +11,7 @@ def get_session_token():
     }
     
     try:
-        response = requests.post(c2_server + "/create_session", headers=headers)
+        response = requests.post(c2_server + "/create_session", headers=headers, verify = cert_path)
         time.sleep(2)
         
         if response.status_code == 200:
