@@ -43,26 +43,40 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 
 1: Open and edit `c2_ip = "<c2-server-ip>"` in `Variables.py` file to what your C2 server ip is.
 
-2: Navigate to `C2` directory and install dependencies on the C2 server.
+2: Open `ssl.cnf` in `CryptoLockerSim` directory and edit the variables `IP.1 = <c2-server-ip>` `CN = <c2-server-ip>` to what your C2 server ip is.
+
+3: Run this command inside `CryptoLockerSim` directory to generate the certificate.
+```
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem -config ssl.cnf -extensions req_ext && \
+mv key.pem cert.pem C2/ && \
+cp C2/cert.pem Client/
+```
+
+4: Move `C2` folder on to your C2 server.
+
+5: Navigate to `C2` directory and install dependencies on the C2 server.
 ```
 pip install -r C2_requirements.txt
 ```
 
-3: Run the C2 server using `C2.py`
+6: Run the C2 server using `C2.py`
 ```
 python3 C2.py
 ```
 
-4: Navigate to `Client` directory and install dependencies on the target VM
+7: Move `Client` folder to your target VM
+
+8: Navigate to `Client` directory and install dependencies on the target VM
 ```
 pip install -r requirements.txt
 ```
 
-5: Run `Main.py` on the target VM
+9: Run `Main.py` on the target VM
 ```
 python3 Main.py
 ```
-6: Open your browser and go to: `"http://{c2_ip}:5000/dashboard/home` to view logs and other dashboard info.
+
+10: Open your browser and go to: `"http://{c2_ip}:5000/dashboard/home` to view logs and other dashboard info.
 
 
 ---
