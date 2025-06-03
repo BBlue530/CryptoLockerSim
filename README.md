@@ -19,7 +19,18 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 > By cloning, downloading, or using this project, you agree to use it responsibly and legally.
 
 ---
+# Prerequisites
 
+### System Requirements
+- **Linux Environment** - recommended for both C2 server and Client.
+- **Virtual Machine** - Client must run inside a Virtual Machine.
+- **Python 3.1 or newer** - Must be installed on both C2 server and Client machine.
+
+### Software Requirements
+- **OpenSSL** - Is needed to generate the TLS certificates.
+- **Firewall Configuration** - Port `5000` must be open to allow the Client to communicate with the C2.
+
+---
 # Features
 
 ### C2 Features
@@ -31,12 +42,13 @@ It demonstrates basic concepts of file encryption, timers, and decryption mechan
 - **Logging** - Logs all requests and responses in JSON.
 - **Access Control** - Requires API key and session token.
 - **SQLite DB** - Tracks keys, payments, and timestamps.
+- **HTTPS Communication - Secure C2-Client communication using OpenSSL
 
 ### Client Features
 - **RSA + AES Encryption** - Encrypts user files with hybrid encryption.
 - **Destruction Timer** - Deletes keys or files after countdown expires.
 - **Persistence Simulation** - Mimics startup behavior on reboot.
-- **C2 Communication** - Interacts with the C2 server for key upload, status checks, and decryption.
+- **C2 Communication** - Interacts with the C2 server for key upload, status checks, and decryption over HTTPS.
 
 ---
 # Usage
